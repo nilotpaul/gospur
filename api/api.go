@@ -1,0 +1,107 @@
+package api
+
+import (
+	"html/template"
+	"io"
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/nilotpaul/go-echo-htmx/config"
+)
+
+type APIServer struct {
+	listenAddr string
+	env        config.EnvConfig
+}
+
+type Template struct {
+	templates *template.Template
+}
+
+func NewAPIServer(env config.EnvConfig) *APIServer {
+	return &APIServer{
+		listenAddr: ":" + env.PORT,
+		env:        env,
+	}
+}
+
+// Start will run the API Server
+// Any global middlewares like Logger should be registered here.
+func (api *APIServer) Start() error {
+	e := echo.New()
+
+	// Global Middlewares
+	api.registerGlobalMiddlewares(e)
+
+	// Routes
+	r := NewRouter(api.env)
+	r.RegisterRoutes(e.Router())
+
+	log.Printf("Visit http://localhost%s", api.listenAddr)
+
+	return e.Start(api.listenAddr)
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
+// Extend the list of global middlewares as needed.
+func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
+	e.Use(middleware.Recover())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Skipper: func(c echo.Context) bool {
+			// Skipping Logging of public assets.
+			return strings.HasPrefix(c.Path(), "/public")
+		},
+		Format: "Time: ${time_rfc3339_nano} HTTP Request on '${uri}' - ${method} (${status}) Took: ${latency_human}\n",
+	}))
+	e.HTTPErrorHandler = HTTPErrorHandler
+
+	// Loading the templates.
+	// In development, it'll log the errors only.
+	// In production, it'll panic and crash.
+	var templates *Template
+	if api.env.ENVIRONMENT == config.PROD {
+		templates = &Template{
+			templates: template.Must(parseTemplates("web")),
+		}
+	} else {
+		tmpls, err := parseTemplates("web")
+		if err != nil {
+			e.Logger.Error(err)
+		}
+		templates = &Template{
+			templates: tmpls,
+		}
+	}
+	e.Renderer = templates
+
+	// Serving static assets from `public` folder.
+	e.Static("/public", "public")
+}
+
+// parseTemplates takes a directory where html files will reside.
+// It'll check nested dirs and load all files with .html ext.
+func parseTemplates(dir string) (*template.Template, error) {
+	tmpl := template.New("")
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if strings.Contains(path, ".html") {
+			_, err = tmpl.ParseFiles(path)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return tmpl, nil
+}

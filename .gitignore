@@ -1,0 +1,7 @@
+.env
+.env.*
+bin
+tmp
+build
+dist
+node_modules
