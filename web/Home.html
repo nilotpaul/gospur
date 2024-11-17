@@ -5,9 +5,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Tailwind Styles -->
-    <link rel="stylesheet" href="public/styles.css" />
+    <link rel="stylesheet" href="public/bundle/styles.css" />
     <!-- For live reloading -->
-    {{ if not .IsProd }}
+    {{ if .IsDEV }}
     <script src="http://localhost:35729/livereload.js"></script>
     {{ end }}
     <!-- Bundled Javascript -->

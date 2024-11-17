@@ -27,14 +27,18 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	if strings.HasPrefix(c.Request().URL.Path, "/api/json") {
 		c.JSON(status, map[string]any{"status": status, "error": msg})
 	} else {
-		c.Render(http.StatusOK, "Error", fullErr)
+		c.Render(http.StatusOK, "Error", map[string]any{
+			"IsDEV":     os.Getenv("ENVIRONMENT") == string(config.DEV),
+			"FullError": fullErr,
+			"Msg":       msg,
+		})
 	}
 }
 
 func handleGetHome(c echo.Context) error {
 	return c.Render(http.StatusOK, "Home", map[string]any{
-		"IsProd": os.Getenv("ENVIRONMENT") == string(config.PROD),
-		"Title":  "Go + Echo + HTMX",
-		"Desc":   "Best for building Full-Stack Applications with minimal JavaScript",
+		"IsDEV": os.Getenv("ENVIRONMENT") == string(config.DEV),
+		"Title": "Go + Echo + HTMX",
+		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }

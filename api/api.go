@@ -58,7 +58,7 @@ func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
 			// Skipping Logging of public assets.
 			return strings.HasPrefix(c.Path(), "/public")
 		},
-		Format: "Time: ${time_rfc3339_nano} HTTP Request on '${uri}' - ${method} (${status}) Took: ${latency_human}\n",
+		Format: "HTTP Request on '${uri}' - ${method} (${status}) Took: ${latency_human}\n",
 	}))
 	e.HTTPErrorHandler = HTTPErrorHandler
 
