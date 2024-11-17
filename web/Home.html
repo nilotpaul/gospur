@@ -21,14 +21,20 @@
   >
     <!-- Container (MAX-WIDTH -> 48rem) -->
     <main class="max-w-3xl mx-auto">
-      <div class="flex items-center mt-4 flex-col justify-center">
-        <h1 class="text-4xl my-6 text-blue-600 font-bold">
+      <div class="flex items-center gap-y-6 mt-4 flex-col justify-center">
+        <h1 class="text-4xl mt-6 mb-0 text-blue-600 font-bold">
           {{ index . "Title" }}
         </h1>
+        <img
+          src="public/golang.jpg"
+          class="rounded-md"
+          height="500"
+          width="500"
+        />
         <p class="text-lg font-medium">{{ index . "Desc" }}</p>
       </div>
 
-      <div class="flex items-center mt-8 justify-center gap-4">
+      <div class="flex items-center mt-4 justify-center gap-4">
         <button
           type="button"
           class="hs-dark-mode hs-dark-mode-active:hidden inline-flex items-center gap-x-2 py-2 px-3 bg-black/80 rounded-full text-sm text-white hover:bg-black/70 focus:outline-none focus:bg-black/70"
