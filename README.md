@@ -10,7 +10,7 @@ This is a minimal project template designed to be highly configurable for your r
 - [TailwindCSS](https://tailwindcss.com) & [Preline](https://preline.co) pre-configured for building modern UIs.
 - [HTMX](https://htmx.org) for enhanced HTML interactivity.
 - Bundling JavaScript with [esbuild](https://esbuild.github.io) (No third-party CDNs).
-- To run in production, all you need is `public` folder.
+- To run in production, all you need is `bin` and `public` folder.
 
 # Prerequisites
 
