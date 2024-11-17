@@ -53,7 +53,6 @@ make
 ```go
 func handleGetHome(c echo.Context) error {
 	return c.Render(http.StatusOK, "Home", map[string]any{
-		"IsDEV": true,
 		"Title": "Go + Echo + HTMX",
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
@@ -62,8 +61,8 @@ func handleGetHome(c echo.Context) error {
 
 ```html
 {{ define "Home" }}
-<h1 class="text-4xl">{{ .Title }}</h1>
-<p class="mt-4">{{ .Desc }}</p>
+<h1 class="text-4xl">{{ index . "Ctx" "Title" }}</h1>
+<p class="mt-4">{{ index . "Ctx" "Desc" }}</p>
 {{ end }}
 ```
 
