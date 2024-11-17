@@ -2,12 +2,10 @@ package api
 
 import (
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/nilotpaul/go-echo-htmx/config"
 )
 
 func HTTPErrorHandler(err error, c echo.Context) {
@@ -28,7 +26,6 @@ func HTTPErrorHandler(err error, c echo.Context) {
 		c.JSON(status, map[string]any{"status": status, "error": msg})
 	} else {
 		c.Render(http.StatusOK, "Error", map[string]any{
-			"IsDEV":     os.Getenv("ENVIRONMENT") == string(config.DEV),
 			"FullError": fullErr,
 			"Msg":       msg,
 		})
@@ -37,7 +34,6 @@ func HTTPErrorHandler(err error, c echo.Context) {
 
 func handleGetHome(c echo.Context) error {
 	return c.Render(http.StatusOK, "Home", map[string]any{
-		"IsDEV": os.Getenv("ENVIRONMENT") == string(config.DEV),
 		"Title": "Go + Echo + HTMX",
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})

@@ -47,7 +47,12 @@ func (api *APIServer) Start() error {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	isDev := os.Getenv("ENVIRONMENT") == string(config.DEV)
+	return t.templates.ExecuteTemplate(w, name, map[string]any{
+		"IsDev": isDev,
+		"Ctx":   data,
+	},
+	)
 }
 
 // Extend the list of global middlewares as needed.

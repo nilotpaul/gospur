@@ -13,7 +13,7 @@ build:
 	@ENVIRONMENT=DEVELOPMENT go build -tags 'dev' -o bin/build
 
 watch:
-	@wgo -debounce 30ms \
+	@wgo \
     -exit \
     -file=.go \
     -file=.html \
@@ -21,4 +21,4 @@ watch:
     :: npx tailwindcss -i ./web/styles/globals.css -o ./public/bundle/styles.css \
     :: ENVIRONMENT=DEVELOPMENT go build -tags 'dev' -o bin/build main.go \
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
-    :: wgo -dir=public npx livereload public
+    :: wgo -debounce 30ms -dir=public npx livereload public

@@ -7,14 +7,14 @@
     <!-- Tailwind Styles -->
     <link rel="stylesheet" href="public/bundle/styles.css" />
     <!-- For live reloading -->
-    {{ if .IsDEV }}
+    {{ if index .IsDev }}
     <script src="http://localhost:35729/livereload.js"></script>
     {{ end }}
     <!-- Bundled Javascript -->
     <script defer src="public/bundle/preline/preline.js"></script>
     <script defer src="public/bundle/htmx.org/dist/htmx.js"></script>
 
-    <title>{{ index . "Title" }}</title>
+    <title>{{ index . "Ctx" "Title" }}</title>
   </head>
   <body
     class="max-w-full min-h-screen bg-gray-300 dark:text-slate-200 text-black dark:bg-gray-950"
@@ -23,7 +23,7 @@
     <main class="max-w-3xl mx-auto">
       <div class="flex items-center gap-y-6 mt-4 flex-col justify-center">
         <h1 class="text-4xl mt-6 mb-0 text-blue-600 font-bold">
-          {{ index . "Title" }}
+          {{ index . "Ctx" "Title" }}
         </h1>
         <img
           src="public/golang.jpg"
@@ -31,7 +31,7 @@
           height="500"
           width="500"
         />
-        <p class="text-lg font-medium">{{ index . "Desc" }}</p>
+        <p class="text-lg font-medium">{{ index . "Ctx" "Desc" }}</p>
       </div>
 
       <div class="flex items-center mt-4 justify-center gap-4">

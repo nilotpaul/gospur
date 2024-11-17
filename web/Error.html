@@ -7,14 +7,14 @@
     <!-- Tailwind Styles -->
     <link rel="stylesheet" href="public/bundle/styles.css" />
     <!-- For live reloading -->
-    {{ if .IsDEV }}
+    {{ if .IsDev }}
     <script src="http://localhost:35729/livereload.js"></script>
     {{ end }}
 
-    <title>{{ index . "Msg" }}</title>
+    <title>{{ index . "Ctx" "Msg" }}</title>
   </head>
   <body class="flex items-center justify-center">
-    <h1 class="font-bold">{{ index . "FullError" }}</h1>
+    <h1 class="font-bold">{{ index . "Ctx" "FullError" }}</h1>
   </body>
 </html>
 {{ end }}
