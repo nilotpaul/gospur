@@ -14,5 +14,5 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println("Final resolved path: ", targetPath)
+	fmt.Println("Final resolved path: ", targetPath.FullPath)
 }

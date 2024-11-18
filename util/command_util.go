@@ -6,7 +6,12 @@ import (
 	"path/filepath"
 )
 
-func GetProjectPath(args []string) (string, error) {
+type ProjectPath struct {
+	FullPath string
+	Path     string
+}
+
+func GetProjectPath(args []string) (*ProjectPath, error) {
 	targetPath := "gospur"
 
 	if len(args) > 0 {
@@ -14,7 +19,7 @@ func GetProjectPath(args []string) (string, error) {
 		finalPath, err := SanitizeDirPath(args[0])
 		if err != nil {
 
-			return "", err
+			return nil, err
 		}
 		// Now it's safe to use the `targetPath`.
 		targetPath = finalPath
@@ -22,10 +27,10 @@ func GetProjectPath(args []string) (string, error) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return "", fmt.Errorf("Error getting the current working directory: ", err)
+		return nil, fmt.Errorf("Error getting the current working directory: %v", err)
 	}
 
 	fullPath := filepath.Join(cwd, targetPath)
 
-	return fullPath, nil
+	return &ProjectPath{FullPath: fullPath, Path: targetPath}, nil
 }
