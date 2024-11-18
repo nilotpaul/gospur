@@ -43,6 +43,6 @@ func TestGetProjectPath(t *testing.T) {
 	// With given arg `../new-project`
 	pp, err = GetProjectPath([]string{"../new-project"})
 	a.Error(err)
-	a.ErrorContains(err, "invalid directory path: '../new-project' contains '..'")
+	a.ErrorContains(err, "Invalid directory path: '../new-project' contains '..'")
 	a.Nil(pp)
 }

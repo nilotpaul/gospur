@@ -28,14 +28,14 @@ func SanitizeDirPath(path string) (string, error) {
 
 	// Check for invalid paths like `/../`.
 	if strings.Contains(dir, "..") {
-		return "", fmt.Errorf("invalid directory path: '%s' contains '..'", dir)
+		return "", fmt.Errorf("Invalid directory path: '%s' contains '..'", dir)
 	}
 
 	// Check the nesting depth.
 	depth := strings.Count(dir, string(filepath.Separator))
 	// Avoid deep nesting for paths more than 3 depth.
 	if depth > maxNestingDepth {
-		return "", fmt.Errorf("invalid directory path: exceeds maximum allowed depth of %d", maxNestingDepth)
+		return "", fmt.Errorf("Invalid directory path: exceeds maximum allowed depth of %d", maxNestingDepth)
 
 	}
 

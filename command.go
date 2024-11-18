@@ -14,5 +14,12 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	cfg, err := util.GetStackConfig()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("Stack config:", *cfg)
 	fmt.Println("Final resolved path: ", targetPath.FullPath)
 }
