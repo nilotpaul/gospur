@@ -1,5 +1,12 @@
+BUILD_DIR = ./bin
+BINARY = $(BUILD_DIR)/gospur
+
+# CLI Commands
+init: build
+	@$(BINARY) init
+
 run: build
-	@./bin/gospur
+	@$(BINARY)
 
 build: 
-	@go build -o bin/gospur main.go
+	@go build -o $(bin/gospur) .

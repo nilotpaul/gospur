@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-	fmt.Println("Go Spur CLI Tool")
+	if err := Execute(); err != nil {
+		fmt.Println("Go Spur exited with an error: ", err)
+		os.Exit(1)
+	}
 }
