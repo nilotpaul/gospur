@@ -19,6 +19,8 @@ With Go Spur, you can focus solely on the backend, while it handles the frontend
 	initCmd = &cobra.Command{
 		Use:   "init",
 		Short: "Initialize a Full-Stack Go Web Project",
+		Args:  cobra.MaximumNArgs(1),
+		Run:   handleInitCmd,
 	}
 )
 
