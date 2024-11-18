@@ -9,4 +9,4 @@ run: build
 	@$(BINARY)
 
 build: 
-	@go build -o $(bin/gospur) .
+	@go build -o $(BINARY) .
