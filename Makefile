@@ -5,8 +5,12 @@ BINARY = $(BUILD_DIR)/gospur
 init: build
 	@$(BINARY) init
 
+# Development Commands
 run: build
 	@$(BINARY)
 
 build: 
 	@go build -o $(BINARY) .
+
+test:
+	@go test -v ./...
