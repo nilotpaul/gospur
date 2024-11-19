@@ -32,7 +32,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, baseTmplFS)
 		if err != nil {
-			return fmt.Errorf("\nFailed to process templates (CLI_ERROR): %v", err)
+			return fmt.Errorf("Failed to process templates (CLI_ERROR): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -42,7 +42,7 @@ func CreateProject(targetDir string, data interface{}) error {
 			nil,
 		)
 		if err != nil {
-			return fmt.Errorf("\nFailed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
+			return fmt.Errorf("Failed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
 		}
 	}
 
@@ -60,7 +60,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, apiTmplFS)
 		if err != nil {
-			return fmt.Errorf("\nFailed to process templates (CLI_ERROR): %v", err)
+			return fmt.Errorf("Failed to process templates (CLI_ERROR): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -70,7 +70,7 @@ func CreateProject(targetDir string, data interface{}) error {
 			data,
 		)
 		if err != nil {
-			return fmt.Errorf("\nFailed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
+			return fmt.Errorf("Failed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
 		}
 	}
 
@@ -92,13 +92,13 @@ func CreateProject(targetDir string, data interface{}) error {
 			pageTmplFS,
 		)
 		if err != nil {
-			return fmt.Errorf("\nFailed to create file -> '%s' due to %v", targetFilePath, err)
+			return fmt.Errorf("Failed to create file -> '%s' due to %v", targetFilePath, err)
 		}
 	}
 
 	// Create an example public asset
 	if err := createExamplePublicAsset(targetDir); err != nil {
-		return fmt.Errorf("\nFailed to create the public directory %v", err)
+		return fmt.Errorf("Failed to create the public directory %v", err)
 	}
 
 	return nil
