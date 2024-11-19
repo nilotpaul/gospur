@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/nilotpaul/gospur/config"
@@ -33,7 +34,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	_, framework, err := frameworkPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to select web framework: %v", err)
+		return nil, fmt.Errorf("Failed to select web framework %v", err)
 	}
 	cfg.WebFramework = framework
 
@@ -44,7 +45,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	_, uiLib, err := uiLibPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to select web framework: %v", err)
+		return nil, fmt.Errorf("Failed to select web framework %v", err)
 	}
 	cfg.UILibrary = uiLib
 
@@ -65,7 +66,7 @@ func GetStackConfig() (*StackConfig, error) {
 
 		_, choice, err := extraPrompt.Run()
 		if err != nil {
-			return nil, fmt.Errorf("Failed to select extras: %w", err)
+			return nil, fmt.Errorf("Failed to select extras %v", err)
 		}
 		if choice == "Yes" {
 			extrasChosen = append(extrasChosen, extra)
@@ -74,6 +75,30 @@ func GetStackConfig() (*StackConfig, error) {
 	cfg.Extras = extrasChosen
 
 	return &cfg, nil
+}
+
+func GetGoModulePath() (string, error) {
+	pathPrompt := promptui.Prompt{
+		Label: "Enter go mod path (eg. github.com/username/repo)",
+		Validate: func(givenPath string) error {
+			if len(givenPath) < 3 {
+				return fmt.Errorf("Path cannot be less than 3 character(s)")
+			}
+			if strings.HasPrefix(givenPath, "https://") {
+				return fmt.Errorf("Invalid path '%s', should not contain https", givenPath)
+			}
+			if strings.ContainsAny(givenPath, " :*?|") {
+				return fmt.Errorf("Invalid path '%s', contains reserved characters", givenPath)
+			}
+			return nil
+		},
+	}
+	path, err := pathPrompt.Run()
+	if err != nil {
+		return "", fmt.Errorf("Error getting the mod path %v", err)
+	}
+
+	return path, nil
 }
 
 func GetProjectPath(args []string) (*ProjectPath, error) {
@@ -92,7 +117,7 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("Error getting the current working directory: %v", err)
+		return nil, fmt.Errorf("Error getting the current working directory %v", err)
 	}
 
 	fullPath := filepath.Join(cwd, targetPath)

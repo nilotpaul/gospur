@@ -9,7 +9,7 @@ import (
 
 const maxNestingDepth = 3
 
-func createTargerDir(path string) error {
+func createTargetDir(path string) error {
 	_, err := os.Stat(path)
 	if err != nil && !os.IsNotExist(err) {
 		return err
