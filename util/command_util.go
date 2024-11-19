@@ -28,6 +28,7 @@ func GetStackConfig() (*StackConfig, error) {
 	// Framework options
 	frameworkPrompt := promptui.Select{
 		Label: "Choose a web framework",
+
 		Items: config.WebFrameworkOpts,
 	}
 	_, framework, err := frameworkPrompt.Run()
@@ -54,6 +55,14 @@ func GetStackConfig() (*StackConfig, error) {
 			Label: "Add " + extra,
 			Items: []string{"No", "Yes"},
 		}
+
+		// If Preline which depends on tailwind is selected as a UI Lib, we skip the
+		// current iteration and add tailwind in `extras` by default.
+		if extra == "Tailwind" && cfg.UILibrary == "Preline (requires tailwind)" {
+			extrasChosen = append(extrasChosen, "Tailwind")
+			continue
+		}
+
 		_, choice, err := extraPrompt.Run()
 		if err != nil {
 			return nil, fmt.Errorf("Failed to select extras: %w", err)
