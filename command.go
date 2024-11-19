@@ -37,7 +37,7 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 			UILibrary:    config.UILibraryOpts[0],
 			Extras:       config.ExtraOpts,
 		}
-		fmt.Println(config.NormalMsg("The CLI is still WIP 🚧, you'll get a default stack for now."))
+		fmt.Println(config.NormalMsg("\nGo Spur is WIP 🚧, you'll only get default stack options for now (More options coming soon).\n"))
 	}
 	// Not needed for now.
 	_ = cfg
