@@ -2,6 +2,7 @@ package util
 
 import (
 	"embed"
+	"fmt"
 	"html/template"
 	"io/fs"
 	"os"
@@ -16,7 +17,7 @@ type processTemplate struct {
 	template       *template.Template
 }
 
-func StartBuilding(targetDir string, data interface{}) error {
+func CreateProject(targetDir string, data interface{}) error {
 	// Ranging over files in base dir which doesn't depend on `StackConfig`
 	for targetPath, templatePath := range config.ProjectBaseFiles {
 		// Getting the embeded folder containing all base template files.
@@ -31,7 +32,7 @@ func StartBuilding(targetDir string, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, baseTmplFS)
 		if err != nil {
-			return err
+			return fmt.Errorf("\nFailed to process templates (CLI_ERROR): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -41,7 +42,7 @@ func StartBuilding(targetDir string, data interface{}) error {
 			nil,
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("\nFailed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
 		}
 	}
 
@@ -59,17 +60,17 @@ func StartBuilding(targetDir string, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, apiTmplFS)
 		if err != nil {
-			return err
+			return fmt.Errorf("\nFailed to process templates (CLI_ERROR): %v", err)
 		}
 
 		// Creating the file with the parsed template.
 		err = createFileFromTemplate(
 			processedTmpl.targetFilePath,
 			processedTmpl.template,
-			nil,
+			data,
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("\nFailed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
 		}
 	}
 
@@ -91,7 +92,7 @@ func StartBuilding(targetDir string, data interface{}) error {
 			pageTmplFS,
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("\nFailed to create file -> '%s' due to %v", targetFilePath, err)
 		}
 	}
 

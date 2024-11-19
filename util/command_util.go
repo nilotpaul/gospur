@@ -108,7 +108,6 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 		// Santize the given path.
 		finalPath, err := SanitizeDirPath(args[0])
 		if err != nil {
-
 			return nil, err
 		}
 		// Now it's safe to use the `targetPath`.

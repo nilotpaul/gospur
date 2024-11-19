@@ -39,6 +39,8 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		}
 		fmt.Println(config.NormalMsg("The CLI is still WIP 🚧, you'll get a default stack for now."))
 	}
+	// Not needed for now.
+	_ = cfg
 
 	// Asking for the go mod path from user.
 	goModPath, err := util.GetGoModulePath()
@@ -52,12 +54,22 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	if err := util.StartBuilding(targetPath.Path, nil); err != nil {
+	if err := util.CreateProject(targetPath.Path, map[string]string{"ModPath": goModPath}); err != nil {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}
 
-	fmt.Println("Go mod path: ", goModPath)
-	fmt.Println("Stack config: ", cfg)
-	fmt.Println("Final resolved path: ", targetPath.FullPath)
+	if err := util.RunGoModInit(targetPath.Path, goModPath); err != nil {
+		fmt.Println(config.ErrMsg(err))
+		return
+	}
+
+	fmt.Println(config.SuccessMsg("\nProject Created! 🎉"))
+	fmt.Println(config.NormalMsg(fmt.Sprintf(`
+Please Run:
+
+cd %s
+go install github.com/bokwoon95/wgo@latest
+npm install
+`, targetPath.Path)))
 }

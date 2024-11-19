@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -26,6 +27,16 @@ func SanitizeDirPath(path string) (string, error) {
 	}
 
 	return dir, nil
+}
+
+func RunGoModInit(fullProjectPath, name string) error {
+	// Change the current working directory to the project directory
+	if err := os.Chdir(fullProjectPath); err != nil {
+		return fmt.Errorf("Failed to change to project directory: %v", err)
+	}
+
+	cmd := exec.Command("go", "mod", "init", name)
+	return cmd.Run()
 }
 
 func CreateTargetDir(path string, strict bool) error {
