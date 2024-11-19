@@ -52,7 +52,7 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	if err := util.ProcessTemplates(targetPath.Path, nil); err != nil {
+	if err := util.StartBuilding(targetPath.Path, nil); err != nil {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}

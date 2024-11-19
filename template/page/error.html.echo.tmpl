@@ -1,0 +1,20 @@
+{{ define "Error" }}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind Styles -->
+    <link rel="stylesheet" href="public/bundle/styles.css" />
+    <!-- For live reloading -->
+    {{ if .IsDev }}
+    <script src="http://localhost:35729/livereload.js"></script>
+    {{ end }}
+
+    <title>{{ index . "Ctx" "Msg" }}</title>
+  </head>
+  <body class="flex items-center justify-center">
+    <h1 class="font-bold">{{ index . "Ctx" "FullError" }}</h1>
+  </body>
+</html>
+{{ end }}

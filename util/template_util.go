@@ -3,6 +3,7 @@ package util
 import (
 	"embed"
 	"html/template"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -15,20 +16,81 @@ type processTemplate struct {
 	template       *template.Template
 }
 
-func ProcessTemplates(targetDir string, data interface{}) error {
-	for targetPath, templatePath := range config.ProjectStructure {
-		// Getting the folder containing all base templates (files that doesn't depend on config).
+func StartBuilding(targetDir string, data interface{}) error {
+	// Ranging over files in base dir which doesn't depend on `StackConfig`
+	for targetPath, templatePath := range config.ProjectBaseFiles {
+		// Getting the embeded folder containing all base template files.
 		baseTmplFS := tmpls.GetBaseFiles()
 
 		// `targetFilePath` is the final path where the file will be stored.
+		// It's joined with the project/target dir.
 		targetFilePath := filepath.Join(targetDir, targetPath)
 
+		// Parsing the raw tempate to get the processed template which will contain
+		// the `targetFilePath`(location where the target file will be written) and
+		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, baseTmplFS)
 		if err != nil {
 			return err
 		}
 
-		if err := createTargetFile(processedTmpl.targetFilePath, processedTmpl.template, nil); err != nil {
+		// Creating the file with the parsed template.
+		err = createFileFromTemplate(
+			processedTmpl.targetFilePath,
+			processedTmpl.template,
+			nil,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Ranging over files in API dir which depend on `StackConfig`
+	for targetPath, templatePath := range config.ProjectAPIFiles {
+		// Getting the embeded folder containing all API template files.
+		apiTmplFS := tmpls.GetAPIFiles()
+
+		// `targetFilePath` is the final path where the file will be stored.
+		// It's joined with the project/target dir.
+		targetFilePath := filepath.Join(targetDir, targetPath)
+
+		// Parsing the raw tempate to get the processed template which will contain
+		// the `targetFilePath`(location where the target file will be written) and
+		// actual `template` itself.
+		processedTmpl, err := parseTemplate(targetFilePath, templatePath, apiTmplFS)
+		if err != nil {
+			return err
+		}
+
+		// Creating the file with the parsed template.
+		err = createFileFromTemplate(
+			processedTmpl.targetFilePath,
+			processedTmpl.template,
+			nil,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Ranging over files in page dir which depend on `StackConfig`.
+	// These needs to be processed seperately as it needs to be written
+	// as template files itself, thus parsing isn't required.
+	for targetPath, templatePath := range config.ProjectPageFiles {
+		// Getting the embeded folder containing all Page template files.
+		pageTmplFS := tmpls.GetPageFiles()
+
+		// `targetFilePath` is the final path where the file will be stored.
+		// It's joined with the project/target dir.
+		targetFilePath := filepath.Join(targetDir, targetPath)
+
+		// Creating the file with the raw template.
+		err := writeRawTemplateFile(
+			targetFilePath,
+			templatePath,
+			pageTmplFS,
+		)
+		if err != nil {
 			return err
 		}
 	}
@@ -37,6 +99,7 @@ func ProcessTemplates(targetDir string, data interface{}) error {
 }
 
 // parseTemplate takes fullWritePath, template path and template embed.
+// fullWritePath -> has to be joined with the project or targetPath. (eg. gospur/config/env.go)
 // tmplPath -> path where the template is stored
 // tmplFS -> template embed FS which contains all template files.
 func parseTemplate(fullWritePath, tmplPath string, tmplFS embed.FS) (*processTemplate, error) {
@@ -54,9 +117,12 @@ func parseTemplate(fullWritePath, tmplPath string, tmplFS embed.FS) (*processTem
 	return &processTemplate{targetFilePath: fullWritePath, template: tmpl}, nil
 }
 
-// createTargetFile takes a fullWritePath and parsed template where it'll write
-// the contents. fullWritePath has to be joined to the project or targetPath. (eg. gospur/config/env.go)
-func createTargetFile(fullWritePath string, tmpl *template.Template, data interface{}) error {
+// createFileFromTemplate writes the output of a parsed template to a specified file path,
+// creating directories as needed.
+// `fullWritePath`: The full path where the file will be created (e.g., "project/config/env.go").
+// `tmpl`: The parsed template to execute and write to the file.
+// `data`: Dynamic data for the template; use `nil` if not required.
+func createFileFromTemplate(fullWritePath string, tmpl *template.Template, data interface{}) error {
 	// Create parent directories for the target file.
 	// Here second arg of `CreateTargetDir` is false which depicts write even
 	// if the directory is not empty.
@@ -77,4 +143,23 @@ func createTargetFile(fullWritePath string, tmpl *template.Template, data interf
 	}
 
 	return nil
+}
+
+// writeRawTemplateFile writes the raw contents of a template file directly to a specified path.
+// `fullWritePath`: The full path where the file will be created (e.g., "project/templates/index.html").
+// `templatePath`: The path of the static template file within the embedded filesystem.
+// `tmplFS`: The embedded filesystem containing the template files.
+func writeRawTemplateFile(fullWritePath, templatePath string, tmplFS embed.FS) error {
+	// Read the static file
+	fileBytes, err := tmplFS.ReadFile(templatePath)
+	if err != nil {
+		return err
+	}
+
+	if err := CreateTargetDir(filepath.Dir(fullWritePath), false); err != nil {
+		return err
+	}
+
+	// Write the file directly
+	return os.WriteFile(fullWritePath, fileBytes, fs.ModePerm)
 }
