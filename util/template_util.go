@@ -96,6 +96,11 @@ func CreateProject(targetDir string, data interface{}) error {
 		}
 	}
 
+	// Create an example public asset
+	if err := createExamplePublicAsset(targetDir); err != nil {
+		return fmt.Errorf("\nFailed to create the public directory %v", err)
+	}
+
 	return nil
 }
 
@@ -163,4 +168,27 @@ func writeRawTemplateFile(fullWritePath, templatePath string, tmplFS embed.FS) e
 
 	// Write the file directly
 	return os.WriteFile(fullWritePath, fileBytes, fs.ModePerm)
+}
+
+func createExamplePublicAsset(projectDir string) error {
+	fullFilePath := filepath.Join(projectDir, "public", "golang.jpg")
+	assetBytes := tmpls.GetGolangImage()
+
+	if err := CreateTargetDir(filepath.Dir(fullFilePath), false); err != nil {
+		return err
+	}
+
+	// Create the file in the public folder in the project dir.
+	destFile, err := os.Create(fullFilePath)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	// Write the (file contents) -> []byte to the created file.
+	if _, err := destFile.Write(assetBytes); err != nil {
+		return err
+	}
+
+	return nil
 }
