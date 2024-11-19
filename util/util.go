@@ -9,20 +9,6 @@ import (
 
 const maxNestingDepth = 3
 
-func createTargetDir(path string) error {
-	_, err := os.Stat(path)
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	// Target dir doesn't exist, we need create it.
-	if err := os.MkdirAll(path, os.ModePerm); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func SanitizeDirPath(path string) (string, error) {
 	dir := filepath.Clean(path)
 
@@ -40,4 +26,37 @@ func SanitizeDirPath(path string) (string, error) {
 	}
 
 	return dir, nil
+}
+
+func CreateTargetDir(path string, strict bool) error {
+	if strict {
+		_, err := doesTargetDirExistAndIsEmpty(path)
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+	}
+
+	// Target dir doesn't exist, we need to create it.
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
+	file, err := os.Stat(target)
+	if err != nil {
+		return false, err
+	}
+	if !file.IsDir() {
+		return false, fmt.Errorf("'%s' is not a directory", target)
+	}
+
+	entires, err := os.ReadDir(target)
+	if err != nil {
+		return false, err
+	}
+
+	return len(entires) == 0, fmt.Errorf("'%s' is not empty", target)
 }

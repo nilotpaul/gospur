@@ -47,6 +47,16 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	if err := util.CreateTargetDir(targetPath.FullPath, true); err != nil {
+		fmt.Println(config.ErrMsg(err))
+		return
+	}
+
+	if err := util.ProcessTemplates(targetPath.Path, nil); err != nil {
+		fmt.Println(config.ErrMsg(err))
+		return
+	}
+
 	fmt.Println("Go mod path: ", goModPath)
 	fmt.Println("Stack config: ", cfg)
 	fmt.Println("Final resolved path: ", targetPath.FullPath)

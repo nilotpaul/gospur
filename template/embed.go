@@ -1,12 +1,12 @@
 package template
 
 import (
-	_ "embed"
+	"embed"
 )
 
-//go:embed base/main.go.tmpl
-var base []byte
+//go:embed base/*
+var base embed.FS
 
-func GetMain() []byte {
+func GetBaseFiles() embed.FS {
 	return base
 }
