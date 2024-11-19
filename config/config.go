@@ -5,7 +5,8 @@ import "github.com/manifoldco/promptui"
 var (
 	ErrMsg     = promptui.Styler(promptui.FGRed)
 	SuccessMsg = promptui.Styler(promptui.FGGreen)
-	NormalMsg  = promptui.Styler(promptui.FGBlack)
+	NormalMsg  = promptui.Styler(promptui.FGWhite)
+	FaintMsg   = promptui.Styler(promptui.FGFaint)
 )
 
 var (
