@@ -69,5 +69,9 @@ func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 		return false, err
 	}
 
-	return len(entires) == 0, fmt.Errorf("'%s' is not empty", target)
+	if len(entires) != 0 {
+		return false, fmt.Errorf("'%s' is not empty", target)
+	}
+
+	return true, nil
 }
