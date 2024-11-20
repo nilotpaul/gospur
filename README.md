@@ -14,7 +14,7 @@ go install github.com/nilotpaul/gospur@latest
 gospur init [project-name]
 ```
 
-**Go Spur is WIP ⚒️, you'll get a default stack(Go + Echo + Tailwind + HTMX) for now.**
+**Go Spur is WIP ⚒️, you'll get a default stack (Go + Echo + Tailwind + HTMX) for now.**
 
 # Docs
 
