@@ -143,3 +143,25 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 
 	return &ProjectPath{FullPath: fullPath, Path: targetPath}, nil
 }
+
+func PrintSuccessMsg(path string) {
+	fmt.Println(config.SuccessMsg("\nProject Created! 🎉\n"))
+	fmt.Println(config.NormalMsg("Please Run:"))
+
+	// Post installation instructions
+	if path == "." {
+		fmt.Println(config.FaintMsg(fmt.Sprintf(`
+go install github.com/bokwoon95/wgo@latest
+go mod tidy
+npm install
+`)))
+	} else {
+		fmt.Println(config.FaintMsg(fmt.Sprintf(`
+cd %s
+go install github.com/bokwoon95/wgo@latest
+go mod tidy
+npm install
+`, path)))
+	}
+
+}

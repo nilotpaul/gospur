@@ -11,7 +11,7 @@ import (
 
 // handleInitCmd handles the `init` command for gospur CLI.
 func handleInitCmd(cmd *cobra.Command, args []string) {
-	// isEarlyStage depicts the CLI is still in early stages
+	// `isEarlyStage` depicts the CLI is still in early stages
 	// and we don't have enough options for user prompts.
 	isEarlyStage := os.Getenv("EARLY_STAGE") == "True"
 
@@ -21,7 +21,7 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Based isEarlyStage we are building the `StackConfig`
+	// Building the stack config by talking user prompts.
 	// If isEarlyStage is not true, we use start taking user prompts.
 	// If isEarlyStage is true, we use a default config.
 	var cfg util.StackConfig
@@ -38,7 +38,7 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 			UILibrary:    config.UILibraryOpts[0],
 			Extras:       config.ExtraOpts,
 		}
-		fmt.Println(config.NormalMsg("\nGo Spur is WIP 🚧, you'll only get default stack options for now (More options coming soon).\n"))
+		fmt.Println(config.NormalMsg("\nGo Spur is WIP 🚧, you'll only get default stack for now (More options coming soon).\n"))
 	}
 	// Not needed for now.
 	_ = cfg
@@ -70,11 +70,5 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println(config.SuccessMsg("\nProject Created! 🎉\n"))
-	fmt.Println("Please Run:")
-	fmt.Println(config.FaintMsg(fmt.Sprintf(`
-cd %s
-go install github.com/bokwoon95/wgo@latest
-npm install
-`, targetPath.Path)))
+	util.PrintSuccessMsg(targetPath.Path)
 }
