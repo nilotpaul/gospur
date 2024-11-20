@@ -24,5 +24,5 @@ Read detailed usage and examples of every stack configured.
 
 # Known Issues
 
-1. Black color used for text not visible in black background terminals. [#1](https://github.com/nilotpaul/gospur/issues/1)
-2. When initialising a project in the current directory, it always says directory is not empty. [#2](https://github.com/nilotpaul/gospur/issues/3)
+1. ~Black color used for text not visible in black background terminals. [#1](https://github.com/nilotpaul/gospur/issues/1)~
+2. ~When initialising a project in the current directory, it always says directory is not empty. [#2](https://github.com/nilotpaul/gospur/issues/3)~
