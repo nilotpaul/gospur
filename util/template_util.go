@@ -39,7 +39,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		err = createFileFromTemplate(
 			processedTmpl.targetFilePath,
 			processedTmpl.template,
-			nil,
+			data,
 		)
 		if err != nil {
 			return fmt.Errorf("Failed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
