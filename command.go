@@ -65,7 +65,7 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 	}
 
 	// Running `go mod init` with the specified name.
-	if err := util.RunGoModInit(targetPath.Path, goModPath); err != nil {
+	if err := util.RunGoModInit(targetPath.FullPath, goModPath); err != nil {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}

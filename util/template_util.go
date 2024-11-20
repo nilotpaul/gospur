@@ -12,11 +12,15 @@ import (
 	tmpls "github.com/nilotpaul/gospur/template"
 )
 
+// processTemplate represents a template that needs to be processed(parsed)
+// and writen to the specified target path in the project directory.
 type processTemplate struct {
 	targetFilePath string
 	template       *template.Template
 }
 
+// CreateProject takes a `targetDir` and any optional data.
+// It creates the necessary folders and files for the entire project.
 func CreateProject(targetDir string, data interface{}) error {
 	// Ranging over files in base dir which doesn't depend on `StackConfig`
 	for targetPath, templatePath := range config.ProjectBaseFiles {
@@ -24,7 +28,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		baseTmplFS := tmpls.GetBaseFiles()
 
 		// `targetFilePath` is the final path where the file will be stored.
-		// It's joined with the project/target dir.
+		// It's joined with the (project or target) dir.
 		targetFilePath := filepath.Join(targetDir, targetPath)
 
 		// Parsing the raw tempate to get the processed template which will contain
@@ -32,7 +36,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, baseTmplFS)
 		if err != nil {
-			return fmt.Errorf("Failed to process templates (CLI_ERROR): %v", err)
+			return fmt.Errorf("Template Parsing Error (pls report): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -60,7 +64,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, apiTmplFS)
 		if err != nil {
-			return fmt.Errorf("Failed to process templates (CLI_ERROR): %v", err)
+			return fmt.Errorf("Template Parsing Error (pls report): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -75,6 +79,7 @@ func CreateProject(targetDir string, data interface{}) error {
 	}
 
 	// Ranging over files in page dir which depend on `StackConfig`.
+	//
 	// These needs to be processed seperately as it needs to be written
 	// as template files itself, thus parsing isn't required.
 	for targetPath, templatePath := range config.ProjectPageFiles {
@@ -104,10 +109,11 @@ func CreateProject(targetDir string, data interface{}) error {
 	return nil
 }
 
-// parseTemplate takes fullWritePath, template path and template embed.
-// fullWritePath -> has to be joined with the project or targetPath. (eg. gospur/config/env.go)
-// tmplPath -> path where the template is stored
-// tmplFS -> template embed FS which contains all template files.
+// parseTemplate takes `fullWritePath`, template path and template embed.
+//
+// `fullWritePath` -> has to be joined with the project or targetPath. (eg. gospur/config/env.go)
+// `tmplPath` -> path where the template is stored
+// `tmplFS` -> template embed FS which contains all template files.
 func parseTemplate(fullWritePath, tmplPath string, tmplFS embed.FS) (*processTemplate, error) {
 	baseTmplBytes, err := tmplFS.ReadFile(tmplPath)
 	if err != nil {
@@ -125,6 +131,7 @@ func parseTemplate(fullWritePath, tmplPath string, tmplFS embed.FS) (*processTem
 
 // createFileFromTemplate writes the output of a parsed template to a specified file path,
 // creating directories as needed.
+//
 // `fullWritePath`: The full path where the file will be created (e.g., "project/config/env.go").
 // `tmpl`: The parsed template to execute and write to the file.
 // `data`: Dynamic data for the template; use `nil` if not required.
@@ -152,6 +159,7 @@ func createFileFromTemplate(fullWritePath string, tmpl *template.Template, data 
 }
 
 // writeRawTemplateFile writes the raw contents of a template file directly to a specified path.
+//
 // `fullWritePath`: The full path where the file will be created (e.g., "project/templates/index.html").
 // `templatePath`: The path of the static template file within the embedded filesystem.
 // `tmplFS`: The embedded filesystem containing the template files.
@@ -170,6 +178,8 @@ func writeRawTemplateFile(fullWritePath, templatePath string, tmplFS embed.FS) e
 	return os.WriteFile(fullWritePath, fileBytes, fs.ModePerm)
 }
 
+// createExamplePublicAsset takes a project dir path and creates a example public
+// asset in the created project template.
 func createExamplePublicAsset(projectDir string) error {
 	fullFilePath := filepath.Join(projectDir, "public", "golang.jpg")
 	assetBytes := tmpls.GetGolangImage()

@@ -2,6 +2,7 @@ package config
 
 import "github.com/manifoldco/promptui"
 
+// For adding styles to console output.
 var (
 	ErrMsg     = promptui.Styler(promptui.FGRed)
 	SuccessMsg = promptui.Styler(promptui.FGGreen)
@@ -9,6 +10,7 @@ var (
 	FaintMsg   = promptui.Styler(promptui.FGFaint)
 )
 
+// Prompt options.
 var (
 	WebFrameworkOpts = []string{
 		"Echo",
@@ -22,6 +24,7 @@ var (
 	}
 )
 
+// Project file structure
 var (
 	ProjectBaseFiles = map[string]string{
 		"config/env.go":          "base/env.go.tmpl",

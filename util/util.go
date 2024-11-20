@@ -10,7 +10,9 @@ import (
 
 const maxNestingDepth = 3
 
-func SanitizeDirPath(path string) (string, error) {
+// SanitizeDirPath takes a `path` and checks if the given
+// project path is valid or not.
+func ValidateDirPath(path string) (string, error) {
 	dir := filepath.Clean(path)
 
 	// Check for invalid paths like `/../`.
@@ -29,6 +31,9 @@ func SanitizeDirPath(path string) (string, error) {
 	return dir, nil
 }
 
+// RunGoModInit takes the full project path and a name.
+// It changes the cwd to the given path and run go mod init
+// with the given name.
 func RunGoModInit(fullProjectPath, name string) error {
 	// Change the current working directory to the project directory
 	if err := os.Chdir(fullProjectPath); err != nil {
@@ -39,6 +44,13 @@ func RunGoModInit(fullProjectPath, name string) error {
 	return cmd.Run()
 }
 
+// CreateTargetDir takes a `path` and `strict`,
+//
+// In strict mode, it'll check if the directory is empty or not
+// if the dir already exists. If the dir doesn't exist it'll create one.
+//
+// If not in strict mode, it'll ignore the directory status and
+// create the necessary dir(s).
 func CreateTargetDir(path string, strict bool) error {
 	if strict {
 		_, err := doesTargetDirExistAndIsEmpty(path)
@@ -55,6 +67,9 @@ func CreateTargetDir(path string, strict bool) error {
 	return nil
 }
 
+// doesTargetDirExistAndIsEmpty takes a `target` path, if it's
+// not a directory, not empty or doesn't exist then it'll return
+// false and an error, otherwise true and nil error.
 func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 	file, err := os.Stat(target)
 	if err != nil {

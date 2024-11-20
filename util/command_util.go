@@ -10,19 +10,31 @@ import (
 	"github.com/nilotpaul/gospur/config"
 )
 
+// StackConfig represents a final stack configuration
+// based on which project files will be made.
 type StackConfig struct {
+	// Echo, Fiber, etc...
 	WebFramework string
-	UILibrary    string
+
+	// UI Library is pre-made styled libs like Preline.
+	UILibrary string
 
 	// Extras are extra add-ons like css lib, HTMX etc.
 	Extras []string
 }
 
+// ProjectPath represents destination or location
+// where user want their project to be created.
 type ProjectPath struct {
+	// FullPath is the absolute path to the project directory.
 	FullPath string
-	Path     string
+
+	// Path is the relative path to the project directory.
+	Path string
 }
 
+// GetStackConfig will give a series of prompts
+// to the user to configure their project stack.
 func GetStackConfig() (*StackConfig, error) {
 	var cfg StackConfig
 
@@ -77,16 +89,21 @@ func GetStackConfig() (*StackConfig, error) {
 	return &cfg, nil
 }
 
+// GetGoModulePath will give a input prompt to the user
+// for them to enter a go mod path.
 func GetGoModulePath() (string, error) {
 	pathPrompt := promptui.Prompt{
 		Label: "Enter go mod path (eg. github.com/username/repo)",
 		Validate: func(givenPath string) error {
+			// Less than 3 character(s).
 			if len(givenPath) < 3 {
 				return fmt.Errorf("Path cannot be less than 3 character(s)")
 			}
+			// Starts with https://
 			if strings.HasPrefix(givenPath, "https://") {
 				return fmt.Errorf("Invalid path '%s', should not contain https", givenPath)
 			}
+			// Contains any of these -> :*?|
 			if strings.ContainsAny(givenPath, " :*?|") {
 				return fmt.Errorf("Invalid path '%s', contains reserved characters", givenPath)
 			}
@@ -101,12 +118,15 @@ func GetGoModulePath() (string, error) {
 	return path, nil
 }
 
+// GetProjectPath takes a slice of args (all provided args), validates
+// and determines the absolute project path depending on the cwd.
+// If no args provided, we fallback to the default set path 'gospur'.
 func GetProjectPath(args []string) (*ProjectPath, error) {
 	targetPath := "gospur"
 
 	if len(args) > 0 {
 		// Santize the given path.
-		finalPath, err := SanitizeDirPath(args[0])
+		finalPath, err := ValidateDirPath(args[0])
 		if err != nil {
 			return nil, err
 		}
