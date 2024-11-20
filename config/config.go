@@ -36,8 +36,8 @@ var (
 	}
 
 	ProjectPageFiles = map[string]string{
-		"web/Home.html":  "page/error.html.echo.tmpl",
-		"web/Error.html": "page/home.html.echo.tmpl",
+		"web/Home.html":  "page/home.html.echo.tmpl",
+		"web/Error.html": "page/error.html.echo.tmpl",
 	}
 
 	ProjectAPIFiles = map[string]string{
