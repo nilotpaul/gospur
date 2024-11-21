@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -93,22 +94,8 @@ func GetStackConfig() (*StackConfig, error) {
 // for them to enter a go mod path.
 func GetGoModulePath() (string, error) {
 	pathPrompt := promptui.Prompt{
-		Label: "Enter go mod path (eg. github.com/username/repo)",
-		Validate: func(givenPath string) error {
-			// Less than 3 character(s).
-			if len(givenPath) < 3 {
-				return fmt.Errorf("Path cannot be less than 3 character(s)")
-			}
-			// Starts with https://
-			if strings.HasPrefix(givenPath, "https://") {
-				return fmt.Errorf("Invalid path '%s', should not contain https", givenPath)
-			}
-			// Contains any of these -> :*?|
-			if strings.ContainsAny(givenPath, " :*?|") {
-				return fmt.Errorf("Invalid path '%s', contains reserved characters", givenPath)
-			}
-			return nil
-		},
+		Label:    "Enter go mod path (eg. github.com/username/repo)",
+		Validate: validateGoModPath,
 	}
 	path, err := pathPrompt.Run()
 	if err != nil {
@@ -116,6 +103,19 @@ func GetGoModulePath() (string, error) {
 	}
 
 	return path, nil
+}
+
+// RunGoModInit takes the full project path and a name.
+// It changes the cwd to the given path and run go mod init
+// with the given name.
+func RunGoModInit(fullProjectPath, name string) error {
+	// Change the current working directory to the project directory
+	if err := os.Chdir(fullProjectPath); err != nil {
+		return fmt.Errorf("Failed to change to project directory: %v", err)
+	}
+
+	cmd := exec.Command("go", "mod", "init", name)
+	return cmd.Run()
 }
 
 // GetProjectPath takes a slice of args (all provided args), validates
@@ -164,4 +164,24 @@ npm install
 `, path)))
 	}
 
+}
+
+func validateGoModPath(path string) error {
+	if len(path) < 3 {
+		return fmt.Errorf("Path cannot be less than 3 character(s)")
+	}
+	// Starts with https://
+	if strings.HasPrefix(path, "https://") {
+		return fmt.Errorf("Invalid path '%s', should not contain https", path)
+	}
+	// Contains any of these -> :*?|
+	if strings.ContainsAny(path, " :*?|") {
+		return fmt.Errorf("Invalid path '%s', contains reserved characters", path)
+	}
+	// Length exceedes 255 character(s)
+	if len(path) > 255 {
+		return fmt.Errorf("Exceeded maximum length")
+	}
+
+	return nil
 }

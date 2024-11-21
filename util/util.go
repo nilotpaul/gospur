@@ -3,7 +3,6 @@ package util
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -29,19 +28,6 @@ func ValidateDirPath(path string) (string, error) {
 	}
 
 	return dir, nil
-}
-
-// RunGoModInit takes the full project path and a name.
-// It changes the cwd to the given path and run go mod init
-// with the given name.
-func RunGoModInit(fullProjectPath, name string) error {
-	// Change the current working directory to the project directory
-	if err := os.Chdir(fullProjectPath); err != nil {
-		return fmt.Errorf("Failed to change to project directory: %v", err)
-	}
-
-	cmd := exec.Command("go", "mod", "init", name)
-	return cmd.Run()
 }
 
 // CreateTargetDir takes a `path` and `strict`,
