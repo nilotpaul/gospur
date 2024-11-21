@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/nilotpaul/gospur/config"
 	tmpls "github.com/nilotpaul/gospur/template"
@@ -21,7 +22,7 @@ type processTemplate struct {
 
 // CreateProject takes a `targetDir` and any optional data.
 // It creates the necessary folders and files for the entire project.
-func CreateProject(targetDir string, data interface{}) error {
+func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	// Ranging over files in base dir which doesn't depend on `StackConfig`
 	for targetPath, templatePath := range config.ProjectBaseFiles {
 		// Getting the embeded folder containing all base template files.
@@ -82,21 +83,21 @@ func CreateProject(targetDir string, data interface{}) error {
 	//
 	// These needs to be processed seperately as it needs to be written
 	// as template files itself, thus parsing isn't required.
-	for targetPath, templatePath := range config.ProjectPageFiles {
-		// Getting the embeded folder containing all Page template files.
-		pageTmplFS := tmpls.GetPageFiles()
+	for targetPath := range config.ProjectPageFiles {
+		var (
+			paths = strings.Split(targetPath, "/")
+			name  = paths[len(paths)-1]
+		)
 
 		// `targetFilePath` is the final path where the file will be stored.
 		// It's joined with the project/target dir.
 		targetFilePath := filepath.Join(targetDir, targetPath)
 
+		// Generation the page content with `StackConfig`.
+		fileBytes := generatePageContent(name, cfg)
+
 		// Creating the file with the raw template.
-		err := writeRawTemplateFile(
-			targetFilePath,
-			templatePath,
-			pageTmplFS,
-		)
-		if err != nil {
+		if err := writeRawTemplateFile(targetFilePath, fileBytes); err != nil {
 			return fmt.Errorf("Failed to create file -> '%s' due to %v", targetFilePath, err)
 		}
 	}
@@ -163,19 +164,13 @@ func createFileFromTemplate(fullWritePath string, tmpl *template.Template, data 
 // `fullWritePath`: The full path where the file will be created (e.g., "project/templates/index.html").
 // `templatePath`: The path of the static template file within the embedded filesystem.
 // `tmplFS`: The embedded filesystem containing the template files.
-func writeRawTemplateFile(fullWritePath, templatePath string, tmplFS embed.FS) error {
-	// Read the static file
-	fileBytes, err := tmplFS.ReadFile(templatePath)
-	if err != nil {
-		return err
-	}
-
+func writeRawTemplateFile(fullWritePath string, bytes []byte) error {
 	if err := CreateTargetDir(filepath.Dir(fullWritePath), false); err != nil {
 		return err
 	}
 
 	// Write the file directly
-	return os.WriteFile(fullWritePath, fileBytes, fs.ModePerm)
+	return os.WriteFile(fullWritePath, bytes, fs.ModePerm)
 }
 
 // createExamplePublicAsset takes a project dir path and creates a example public

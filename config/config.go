@@ -12,14 +12,18 @@ var (
 
 // UILibrary represents an UI Library and `DependsOn`
 // which means it can depend on any chosen CSS Strategy (framework).
-type UILibrary struct {
-	// Name of the UI Library
-	Name string
+type (
+	ProjectCtx map[string]any
 
-	// An UI Library can depend on any chosen CSS Strategy.
-	// If it's independent, `DependsOn` should be an empty string.
-	DependsOn string
-}
+	UILibrary struct {
+		// Name of the UI Library
+		Name string
+
+		// An UI Library can depend on any chosen CSS Strategy.
+		// If it's independent, `DependsOn` should be an empty string.
+		DependsOn string
+	}
+)
 
 // Prompt options.
 var (
@@ -53,8 +57,8 @@ var (
 	}
 
 	ProjectPageFiles = map[string]string{
-		"web/Home.html":  "page/home.html.echo.tmpl",
-		"web/Error.html": "page/error.html.echo.tmpl",
+		"web/Home.html":  "",
+		"web/Error.html": "",
 	}
 
 	ProjectAPIFiles = map[string]string{

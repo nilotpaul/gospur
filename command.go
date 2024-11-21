@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/nilotpaul/gospur/config"
 	"github.com/nilotpaul/gospur/util"
@@ -26,9 +25,6 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 	}
 	cfg = *stackCfg
 
-	fmt.Println(cfg)
-	os.Exit(0)
-
 	// Asking for the go mod path from user.
 	goModPath, err := util.GetGoModulePath()
 	if err != nil {
@@ -45,7 +41,12 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 
 	// Creating the project files in the target directory.
 	// Passing the go mod path for resolving Go imports.
-	if err := util.CreateProject(targetPath.Path, map[string]string{"ModPath": goModPath}); err != nil {
+	err = util.CreateProject(
+		targetPath.Path,
+		cfg,
+		util.MakeProjectCtx(cfg, goModPath),
+	)
+	if err != nil {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}

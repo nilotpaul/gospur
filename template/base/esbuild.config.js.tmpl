@@ -5,7 +5,7 @@ const b = () =>
     bundle: true,
     entryPoints: [
       "node_modules/preline/preline.js",
-      "node_modules/htmx.org/dist/htmx.js",
+      {{- if .Extras.HasHTMX }}"node_modules/htmx.org/dist/htmx.js",{{- end }}
     ],
     platform: "node",
     outdir: "public/bundle",
