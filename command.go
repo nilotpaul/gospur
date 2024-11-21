@@ -11,10 +11,6 @@ import (
 
 // handleInitCmd handles the `init` command for gospur CLI.
 func handleInitCmd(cmd *cobra.Command, args []string) {
-	// `isEarlyStage` depicts the CLI is still in early stages
-	// and we don't have enough options for user prompts.
-	isEarlyStage := os.Getenv("EARLY_STAGE") == "True"
-
 	targetPath, err := util.GetProjectPath(args)
 	if err != nil {
 		fmt.Println(config.ErrMsg(err))
@@ -22,26 +18,16 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 	}
 
 	// Building the stack config by talking user prompts.
-	// If isEarlyStage is not true, we use start taking user prompts.
-	// If isEarlyStage is true, we use a default config.
 	var cfg util.StackConfig
-	if !isEarlyStage {
-		stackCfg, err := util.GetStackConfig()
-		if err != nil {
-			fmt.Println(config.ErrMsg(err))
-			return
-		}
-		cfg = *stackCfg
-	} else {
-		cfg = util.StackConfig{
-			WebFramework: config.WebFrameworkOpts[0],
-			UILibrary:    config.UILibraryOpts[0],
-			Extras:       config.ExtraOpts,
-		}
-		fmt.Println(config.NormalMsg("\nGo Spur is WIP 🚧, you'll only get default stack for now (More options coming soon).\n"))
+	stackCfg, err := util.GetStackConfig()
+	if err != nil {
+		fmt.Println(config.ErrMsg(err))
+		return
 	}
-	// Not needed for now.
-	_ = cfg
+	cfg = *stackCfg
+
+	fmt.Println(cfg)
+	os.Exit(0)
 
 	// Asking for the go mod path from user.
 	goModPath, err := util.GetGoModulePath()

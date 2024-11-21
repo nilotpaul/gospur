@@ -5,22 +5,36 @@ import "github.com/manifoldco/promptui"
 // For adding styles to console output.
 var (
 	ErrMsg     = promptui.Styler(promptui.FGRed)
-	SuccessMsg = promptui.Styler(promptui.FGGreen)
+	SuccessMsg = promptui.Styler(promptui.FGGreen, promptui.FGBold)
 	NormalMsg  = promptui.Styler(promptui.FGWhite)
 	FaintMsg   = promptui.Styler(promptui.FGFaint)
 )
+
+// UILibrary represents an UI Library and `DependsOn`
+// which means it can depend on any chosen CSS Strategy (framework).
+type UILibrary struct {
+	// Name of the UI Library
+	Name string
+
+	// An UI Library can depend on any chosen CSS Strategy.
+	// If it's independent, `DependsOn` should be an empty string.
+	DependsOn string
+}
 
 // Prompt options.
 var (
 	WebFrameworkOpts = []string{
 		"Echo",
 	}
-	UILibraryOpts = []string{
-		"Preline (requires tailwind)",
-	}
 	ExtraOpts = []string{
-		"Tailwind",
 		"HTMX",
+	}
+
+	CssStrategyOpts = []string{
+		"Tailwind",
+	}
+	UILibraryOpts = map[string][]string{
+		"Preline": {"Tailwind"},
 	}
 )
 
