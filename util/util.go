@@ -57,7 +57,8 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 	return map[string]any{
 		"ModPath": modPath,
 		"Extras": map[string]any{
-			"HasHTMX": contains(cfg.Extras, "HTMX"),
+			"HasHTMX":     contains(cfg.Extras, "HTMX"),
+			"HasTailwind": cfg.UILibrary == "Tailwind",
 		},
 	}
 }

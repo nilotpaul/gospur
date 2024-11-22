@@ -1,3 +1,4 @@
+{{ if .Extras.HasTailwind }}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,3 +8,4 @@
     @apply text-4xl my-6;
   }
 }
+{{ end }}

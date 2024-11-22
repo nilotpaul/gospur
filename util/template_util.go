@@ -23,8 +23,11 @@ type processTemplate struct {
 // CreateProject takes a `targetDir` and any optional data.
 // It creates the necessary folders and files for the entire project.
 func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
+	var (
+		projectBaseFiles = filterProjectBaseFiles(cfg)
+	)
 	// Ranging over files in base dir which doesn't depend on `StackConfig`
-	for targetPath, templatePath := range config.ProjectBaseFiles {
+	for targetPath, templatePath := range projectBaseFiles {
 		// Getting the embeded folder containing all base template files.
 		baseTmplFS := tmpls.GetBaseFiles()
 
@@ -93,7 +96,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		// It's joined with the project/target dir.
 		targetFilePath := filepath.Join(targetDir, targetPath)
 
-		// Generation the page content with `StackConfig`.
+		// Generating the page content with `StackConfig`.
 		fileBytes := generatePageContent(name, cfg)
 
 		// Creating the file with the raw template.
@@ -108,6 +111,22 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	}
 
 	return nil
+}
+
+func filterProjectBaseFiles(cfg StackConfig) map[string]string {
+	filteredMap := make(map[string]string)
+
+	for file, tmpl := range config.ProjectBaseFiles {
+		// Skip tailwind config if it is not chosen as a CSS Strategy.
+		if file == "tailwind.config.ts" && cfg.CssStrategy != "Tailwind" {
+			continue
+		}
+
+		// Add rest if it passes all conditions.
+		filteredMap[file] = tmpl
+	}
+
+	return filteredMap
 }
 
 // parseTemplate takes `fullWritePath`, template path and template embed.
