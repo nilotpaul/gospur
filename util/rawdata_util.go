@@ -3,6 +3,8 @@ package util
 import (
 	"fmt"
 	"strings"
+
+	"github.com/yosssi/gohtml"
 )
 
 const (
@@ -120,7 +122,7 @@ func generatePageContent(page string, cfg StackConfig) []byte {
 	default:
 	}
 
-	return []byte(result)
+	return []byte(gohtml.Format(result))
 }
 
 func processRawHomePageData(cfg StackConfig) string {
@@ -179,32 +181,32 @@ func processRawErrorPageData(cfg StackConfig) string {
 
 func generateHomeHTMLBody(cfg StackConfig) string {
 	if cfg.CssStrategy == "Vanilla CSS" {
-		return addMultilineIndentation(basicHomeBodyExampleHTML, 1)
+		return basicHomeBodyExampleHTML
 	}
 	if cfg.CssStrategy == "Tailwind" {
-		return addMultilineIndentation(tailwindHomeBodyExampleHTML, 1)
+		return basicHomeBodyExampleHTML
 	}
-	return addMultilineIndentation(basicHomeBodyExampleHTML, 1)
+	return basicHomeBodyExampleHTML
 }
 
 func generateErrorHTMLBody(cfg StackConfig) string {
 	if cfg.CssStrategy == "Vanilla CSS" {
-		return addMultilineIndentation(basicErrorBodyExampleHTML, 1)
+		return basicErrorBodyExampleHTML
 	}
 	if cfg.CssStrategy == "Tailwind" {
-		return addMultilineIndentation(tailwindErrorBodyExampleHTML, 1)
+		return tailwindErrorBodyExampleHTML
 	}
-	return addMultilineIndentation(basicErrorBodyExampleHTML, 1)
+	return basicErrorBodyExampleHTML
 }
 
 func generateHeadScripts(cfg StackConfig) string {
 	scripts := []string{"<!-- Bundled Javascript -->"}
 
 	if contains(cfg.Extras, "HTMX") {
-		scripts = append(scripts, "\t\t"+`<script defer src="public/bundle/htmx.org/dist/htmx.js"></script>`)
+		scripts = append(scripts, `<script defer src="public/bundle/htmx.org/dist/htmx.js"></script>`)
 	}
 	if cfg.UILibrary == "Preline" {
-		scripts = append(scripts, "\t\t"+`<script defer src="public/bundle/preline/preline.js"></script>`)
+		scripts = append(scripts, `<script defer src="public/bundle/preline/preline.js"></script>`)
 	}
 	if len(scripts) == 1 {
 		return ""
@@ -217,7 +219,7 @@ func generateHeadStyles(cfg StackConfig) string {
 	styles := []string{"<!-- Styles -->"}
 
 	if cfg.CssStrategy == "Tailwind" {
-		styles = append(styles, "\t\t"+`<link rel="stylesheet" href="public/bundle/styles.css" />`)
+		styles = append(styles, `<link rel="stylesheet" href="public/bundle/styles.css" />`)
 	}
 	if len(styles) == 1 {
 		return ""
