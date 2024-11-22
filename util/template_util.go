@@ -116,13 +116,13 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 // `tmplPath` -> path where the template is stored
 // `tmplFS` -> template embed FS which contains all template files.
 func parseTemplate(fullWritePath, tmplPath string, tmplFS embed.FS) (*processTemplate, error) {
-	baseTmplBytes, err := tmplFS.ReadFile(tmplPath)
+	fileBytes, err := tmplFS.ReadFile(tmplPath)
 	if err != nil {
 		return nil, err
 	}
 
 	// Parsing the tmpl bytes(file contents) to get the actual template.
-	tmpl, err := template.New(filepath.Base(tmplPath)).Parse(string(baseTmplBytes))
+	tmpl, err := template.New(filepath.Base(tmplPath)).Parse(string(fileBytes))
 	if err != nil {
 		return nil, err
 	}

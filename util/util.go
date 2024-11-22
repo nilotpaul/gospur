@@ -86,6 +86,22 @@ func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 	return true, nil
 }
 
+func addIndentation(str string, indentLevel int) string {
+	indent := strings.Repeat("\t", indentLevel)
+	return indent + str
+}
+
+func addMultilineIndentation(str string, indentLevel int) string {
+	indent := strings.Repeat("\t", indentLevel)
+	// Split the input into lines
+	lines := strings.Split(str, "\n")
+	for i, line := range lines {
+		lines[i] = indent + line
+	}
+	// Join the lines back into a single string
+	return strings.Join(lines, "\n")
+}
+
 func contains(slice []string, item string) bool {
 	for _, v := range slice {
 		if v == item {

@@ -36,6 +36,7 @@ var (
 
 	CssStrategyOpts = []string{
 		"Tailwind",
+		"Vanilla CSS",
 	}
 	UILibraryOpts = map[string][]string{
 		"Preline": {"Tailwind"},
@@ -56,6 +57,8 @@ var (
 		"main.go":                "base/main.go.tmpl",
 	}
 
+	// Template path is not required anymore for pages.
+	// We're processing these as raw files.
 	ProjectPageFiles = map[string]string{
 		"web/Home.html":  "",
 		"web/Error.html": "",

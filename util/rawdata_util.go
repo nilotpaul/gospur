@@ -5,37 +5,27 @@ import (
 	"strings"
 )
 
-func generatePageContent(page string, cfg StackConfig) []byte {
-	var result string
+const (
+	basicHomeBodyExampleHTML = `
+<body>
+  <main>
+    <div>
+      <h1>{{ index . "Ctx" "Title" }}</h1>
+      <img
+        src="public/golang.jpg"
+        class="rounded-md"
+        height="500"
+        width="500"
+      />
+      <p>{{ index . "Ctx" "Desc" }}</p>
+    </div>
 
-	switch page {
-	case "Home.html":
-		result = processRawHomePageData(cfg)
-	case "Error.html":
-		result = processRawErrorPageData(cfg)
-	default:
-	}
-
-	return []byte(result)
-}
-
-func processRawHomePageData(cfg StackConfig) string {
-	homeHTML := fmt.Sprintf(
-		`{{ define "Home" }}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    %s
-    <!-- For live reloading -->
-    {{ if index .IsDev }}
-    <script src="http://localhost:35729/livereload.js"></script>
-    {{ end }}
-    %s
-
-    <title>{{ index . "Ctx" "Title" }}</title>
-  </head>
+    <div>
+      <button>Light</button>
+    </div>
+  </main>
+</body>`
+	tailwindHomeBodyExampleHTML = `
   <body
     class="max-w-full min-h-screen bg-gray-300 dark:text-slate-200 text-black dark:bg-gray-950"
   >
@@ -107,26 +97,68 @@ func processRawHomePageData(cfg StackConfig) string {
         </button>
       </div>
     </main>
-  </body>
-</html>
-{{ end }}
-`,
-		generateHeadStyles(cfg),
-		generateHeadScripts(cfg),
-	)
+  </body>  `
 
-	return homeHTML
+	basicErrorBodyExampleHTML = `
+<body>
+  <h1>{{ index . "Ctx" "FullError" }}</h1>
+</body>`
+	tailwindErrorBodyExampleHTML = `
+<body class="flex items-center justify-center">
+    <h1 class="font-bold">{{ index . "Ctx" "FullError" }}</h1>
+</body>`
+)
+
+func generatePageContent(page string, cfg StackConfig) []byte {
+	var result string
+
+	switch page {
+	case "Home.html":
+		result = processRawHomePageData(cfg)
+	case "Error.html":
+		result = processRawErrorPageData(cfg)
+	default:
+	}
+
+	return []byte(result)
 }
 
-func processRawErrorPageData(_ StackConfig) string {
-	const errorHTML string = `{{ define "Error" }}
+func processRawHomePageData(cfg StackConfig) string {
+	homeHTML := fmt.Sprintf(`{{ define "Home" }}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Tailwind Styles -->
-    <link rel="stylesheet" href="public/bundle/styles.css" />
+    %s
+    <!-- For live reloading -->
+    {{ if index .IsDev }}
+    <script src="http://localhost:35729/livereload.js"></script>
+    {{ end }}
+    %s
+
+    <title>{{ index . "Ctx" "Title" }}</title>
+  </head>
+  %s
+</html>
+{{ end }}
+`,
+		generateHeadStyles(cfg),
+		generateHeadScripts(cfg),
+		generateHomeHTMLBody(cfg),
+	)
+
+	return homeHTML
+}
+
+func processRawErrorPageData(cfg StackConfig) string {
+	errorHTML := fmt.Sprintf(`{{ define "Error" }}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    %s
     <!-- For live reloading -->
     {{ if .IsDev }}
     <script src="http://localhost:35729/livereload.js"></script>
@@ -134,14 +166,35 @@ func processRawErrorPageData(_ StackConfig) string {
 
     <title>{{ index . "Ctx" "Msg" }}</title>
   </head>
-  <body class="flex items-center justify-center">
-    <h1 class="font-bold">{{ index . "Ctx" "FullError" }}</h1>
-  </body>
+  %s
 </html>
 {{ end }}
-`
-	// Currently no modification required.
+`,
+		generateHeadStyles(cfg),
+		generateErrorHTMLBody(cfg),
+	)
+
 	return errorHTML
+}
+
+func generateHomeHTMLBody(cfg StackConfig) string {
+	if cfg.CssStrategy == "Vanilla CSS" {
+		return addMultilineIndentation(basicHomeBodyExampleHTML, 1)
+	}
+	if cfg.CssStrategy == "Tailwind" {
+		return addMultilineIndentation(tailwindHomeBodyExampleHTML, 1)
+	}
+	return addMultilineIndentation(basicHomeBodyExampleHTML, 1)
+}
+
+func generateErrorHTMLBody(cfg StackConfig) string {
+	if cfg.CssStrategy == "Vanilla CSS" {
+		return addMultilineIndentation(basicErrorBodyExampleHTML, 1)
+	}
+	if cfg.CssStrategy == "Tailwind" {
+		return addMultilineIndentation(tailwindErrorBodyExampleHTML, 1)
+	}
+	return addMultilineIndentation(basicErrorBodyExampleHTML, 1)
 }
 
 func generateHeadScripts(cfg StackConfig) string {
@@ -150,11 +203,9 @@ func generateHeadScripts(cfg StackConfig) string {
 	if contains(cfg.Extras, "HTMX") {
 		scripts = append(scripts, "\t\t"+`<script defer src="public/bundle/htmx.org/dist/htmx.js"></script>`)
 	}
-
 	if cfg.UILibrary == "Preline" {
 		scripts = append(scripts, "\t\t"+`<script defer src="public/bundle/preline/preline.js"></script>`)
 	}
-
 	if len(scripts) == 1 {
 		return ""
 	}
@@ -163,12 +214,11 @@ func generateHeadScripts(cfg StackConfig) string {
 }
 
 func generateHeadStyles(cfg StackConfig) string {
-	styles := []string{"<!-- Tailwind Styles -->"}
+	styles := []string{"<!-- Styles -->"}
 
 	if cfg.CssStrategy == "Tailwind" {
 		styles = append(styles, "\t\t"+`<link rel="stylesheet" href="public/bundle/styles.css" />`)
 	}
-
 	if len(styles) == 1 {
 		return ""
 	}
