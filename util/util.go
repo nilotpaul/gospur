@@ -56,9 +56,15 @@ func CreateTargetDir(path string, strict bool) error {
 func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 	return map[string]any{
 		"ModPath": modPath,
-		"Extras": map[string]any{
-			"HasHTMX":     contains(cfg.Extras, "HTMX"),
-			"HasTailwind": cfg.UILibrary == "Tailwind",
+		"UI": map[string]bool{
+			// CSS Strategy
+			"HasTailwind": cfg.CssStrategy == "Tailwind",
+
+			// CSS Library
+			"HasPreline": cfg.UILibrary == "Preline",
+		},
+		"Extras": map[string]bool{
+			"HasHTMX": contains(cfg.Extras, "HTMX"),
 		},
 	}
 }
@@ -87,22 +93,7 @@ func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 	return true, nil
 }
 
-func addIndentation(str string, indentLevel int) string {
-	indent := strings.Repeat("\t", indentLevel)
-	return indent + str
-}
-
-func addMultilineIndentation(str string, indentLevel int) string {
-	indent := strings.Repeat("\t", indentLevel)
-	// Split the input into lines
-	lines := strings.Split(str, "\n")
-	for i, line := range lines {
-		lines[i] = indent + line
-	}
-	// Join the lines back into a single string
-	return strings.Join(lines, "\n")
-}
-
+// contains checks if a slice of string contains the given item.
 func contains(slice []string, item string) bool {
 	for _, v := range slice {
 		if v == item {

@@ -4,11 +4,14 @@ const b = () =>
   build({
     bundle: true,
     entryPoints: [
+      {{- if .UI.HasPreline }}
       "node_modules/preline/preline.js",
+      {{- end }}
       {{- if .Extras.HasHTMX }}
       "node_modules/htmx.org/dist/htmx.js",
       {{- end }}
     ],
+    entryNames: "[name]",
     platform: "node",
     outdir: "public/bundle",
     loader: { ".node": "file" },

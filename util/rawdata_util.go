@@ -180,19 +180,13 @@ func processRawErrorPageData(cfg StackConfig) string {
 }
 
 func generateHomeHTMLBody(cfg StackConfig) string {
-	if cfg.CssStrategy == "Vanilla CSS" {
-		return basicHomeBodyExampleHTML
-	}
 	if cfg.CssStrategy == "Tailwind" {
-		return basicHomeBodyExampleHTML
+		return tailwindHomeBodyExampleHTML
 	}
 	return basicHomeBodyExampleHTML
 }
 
 func generateErrorHTMLBody(cfg StackConfig) string {
-	if cfg.CssStrategy == "Vanilla CSS" {
-		return basicErrorBodyExampleHTML
-	}
 	if cfg.CssStrategy == "Tailwind" {
 		return tailwindErrorBodyExampleHTML
 	}
@@ -203,10 +197,10 @@ func generateHeadScripts(cfg StackConfig) string {
 	scripts := []string{"<!-- Bundled Javascript -->"}
 
 	if contains(cfg.Extras, "HTMX") {
-		scripts = append(scripts, `<script defer src="public/bundle/htmx.org/dist/htmx.js"></script>`)
+		scripts = append(scripts, `<script defer src="public/bundle/htmx.js"></script>`)
 	}
 	if cfg.UILibrary == "Preline" {
-		scripts = append(scripts, `<script defer src="public/bundle/preline/preline.js"></script>`)
+		scripts = append(scripts, `<script defer src="public/bundle/preline.js"></script>`)
 	}
 	if len(scripts) == 1 {
 		return ""
