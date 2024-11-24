@@ -1,15 +1,9 @@
 start: 
-    {{- if .UI.HasTailwind }}
-	@npx tailwindcss -i ./web/styles/globals.css -o ./public/bundle/styles.css --minify
-	{{- end }}
 	@node ./esbuild.config.js
 	@ENVIRONMENT=PRODUCTION go build -tags '!dev' -o bin/build
 	@ENVIRONMENT=PRODUCTION ./bin/build
 
 build:
-    {{- if .UI.HasTailwind }}
-	@npx tailwindcss -i ./web/styles/globals.css -o ./public/bundle/styles.css
-	{{- end }}
 	@node ./esbuild.config.js
 	@ENVIRONMENT=DEVELOPMENT go build -tags 'dev' -o bin/build
 
@@ -18,10 +12,9 @@ dev:
     -exit \
     -file=.go \
     -file=.html \
-    node ./esbuild.config.js \
-    {{- if .UI.HasTailwind }}
-	:: npx tailwindcss -i ./web/styles/globals.css -o ./public/bundle/styles.css \
-	{{- end }}
-    :: ENVIRONMENT=DEVELOPMENT go build -tags 'dev' -o bin/build main.go \
+	-file=.css \
+	-xdir=public \
+    ENVIRONMENT=DEVELOPMENT go build -tags 'dev' -o bin/build main.go \
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
-    :: wgo -debounce 30ms -dir=public npx livereload public
+    :: wgo -dir=web node ./esbuild.config.js \
+	:: wgo -dir=node_modules npx livereload -w 1000 web

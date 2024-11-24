@@ -1,11 +1,20 @@
-{{ if .UI.HasTailwind }}
+{{- if .UI.HasTailwind -}}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  h1 {
-    @apply text-4xl my-6;
-  }
+{{- else -}}
+h1 {
+  color: red;
+  text-align: center;
 }
-{{ end }}
+
+.container {
+  max-width: 48rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+{{- end }}
