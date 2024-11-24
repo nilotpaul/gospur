@@ -150,7 +150,7 @@ func generateHeadScripts(cfg StackConfig) string {
 	return strings.Join(scripts, "\n")
 }
 
-func generateHeadStyles(cfg StackConfig) string {
+func generateHeadStyles(_ StackConfig) string {
 	styles := []string{
 		"<!-- Styles -->",
 		`<link rel="stylesheet" href="public/bundle/globals.css" />`,
