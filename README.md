@@ -35,7 +35,7 @@ Read detailed usage and examples of every stack configured.
 
 - [Go + Echo + Tailwind + HTMX](https://github.com/nilotpaul/gospur/tree/go-echo-tailwind-htmx)
 
-# Common Soon
+# Coming Soon
 
 - More Framework Options.
 - Deployments strategies like docker.
