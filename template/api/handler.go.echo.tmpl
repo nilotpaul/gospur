@@ -34,7 +34,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 
 func handleGetHome(c echo.Context) error {
 	return c.Render(http.StatusOK, "Home", map[string]any{
-		"Title": "Go + Echo + HTMX",
+		"Title": "GoSpur Stack",
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }

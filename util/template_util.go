@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/nilotpaul/gospur/config"
 	tmpls "github.com/nilotpaul/gospur/template"
@@ -21,11 +22,16 @@ type processTemplate struct {
 
 // CreateProject takes a `targetDir` and any optional data.
 // It creates the necessary folders and files for the entire project.
-func CreateProject(targetDir string, data interface{}) error {
+func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	// Ranging over files in base dir which doesn't depend on `StackConfig`
 	for targetPath, templatePath := range config.ProjectBaseFiles {
+		// Skip to the next iteration if `skipProjectfiles` returns true.
+		if skip := skipProjectfiles(targetPath, cfg); skip {
+			continue
+		}
+
 		// Getting the embeded folder containing all base template files.
-		baseTmplFS := tmpls.GetBaseFiles()
+		tmplFS := tmpls.GetBaseFiles()
 
 		// `targetFilePath` is the final path where the file will be stored.
 		// It's joined with the (project or target) dir.
@@ -34,7 +40,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		// Parsing the raw tempate to get the processed template which will contain
 		// the `targetFilePath`(location where the target file will be written) and
 		// actual `template` itself.
-		processedTmpl, err := parseTemplate(targetFilePath, templatePath, baseTmplFS)
+		processedTmpl, err := parseTemplate(targetFilePath, templatePath, tmplFS)
 		if err != nil {
 			return fmt.Errorf("Template Parsing Error (pls report): %v", err)
 		}
@@ -46,14 +52,18 @@ func CreateProject(targetDir string, data interface{}) error {
 			data,
 		)
 		if err != nil {
-			return fmt.Errorf("Failed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
+			return fmt.Errorf(
+				"Failed to create file -> '%s' due to %v",
+				processedTmpl.targetFilePath,
+				err,
+			)
 		}
 	}
 
-	// Ranging over files in API dir which depend on `StackConfig`
+	// Ranging over files in API dir which depend on `StackConfig`.
 	for targetPath, templatePath := range config.ProjectAPIFiles {
 		// Getting the embeded folder containing all API template files.
-		apiTmplFS := tmpls.GetAPIFiles()
+		tmplFS := tmpls.GetAPIFiles()
 
 		// `targetFilePath` is the final path where the file will be stored.
 		// It's joined with the project/target dir.
@@ -62,7 +72,7 @@ func CreateProject(targetDir string, data interface{}) error {
 		// Parsing the raw tempate to get the processed template which will contain
 		// the `targetFilePath`(location where the target file will be written) and
 		// actual `template` itself.
-		processedTmpl, err := parseTemplate(targetFilePath, templatePath, apiTmplFS)
+		processedTmpl, err := parseTemplate(targetFilePath, templatePath, tmplFS)
 		if err != nil {
 			return fmt.Errorf("Template Parsing Error (pls report): %v", err)
 		}
@@ -74,7 +84,11 @@ func CreateProject(targetDir string, data interface{}) error {
 			data,
 		)
 		if err != nil {
-			return fmt.Errorf("Failed to create file -> '%s' due to %v", processedTmpl.targetFilePath, err)
+			return fmt.Errorf(
+				"Failed to create file -> '%s' due to %v",
+				processedTmpl.targetFilePath,
+				err,
+			)
 		}
 	}
 
@@ -82,22 +96,26 @@ func CreateProject(targetDir string, data interface{}) error {
 	//
 	// These needs to be processed seperately as it needs to be written
 	// as template files itself, thus parsing isn't required.
-	for targetPath, templatePath := range config.ProjectPageFiles {
-		// Getting the embeded folder containing all Page template files.
-		pageTmplFS := tmpls.GetPageFiles()
+	for targetPath := range config.ProjectPageFiles {
+		var (
+			paths = strings.Split(targetPath, "/")
+			name  = paths[len(paths)-1]
+		)
 
 		// `targetFilePath` is the final path where the file will be stored.
 		// It's joined with the project/target dir.
 		targetFilePath := filepath.Join(targetDir, targetPath)
 
+		// Generating the page content with `StackConfig`.
+		fileBytes := generatePageContent(name, cfg)
+
 		// Creating the file with the raw template.
-		err := writeRawTemplateFile(
-			targetFilePath,
-			templatePath,
-			pageTmplFS,
-		)
-		if err != nil {
-			return fmt.Errorf("Failed to create file -> '%s' due to %v", targetFilePath, err)
+		if err := writeRawTemplateFile(targetFilePath, fileBytes); err != nil {
+			return fmt.Errorf(
+				"Failed to create file -> '%s' due to %v",
+				targetFilePath,
+				err,
+			)
 		}
 	}
 
@@ -115,13 +133,13 @@ func CreateProject(targetDir string, data interface{}) error {
 // `tmplPath` -> path where the template is stored
 // `tmplFS` -> template embed FS which contains all template files.
 func parseTemplate(fullWritePath, tmplPath string, tmplFS embed.FS) (*processTemplate, error) {
-	baseTmplBytes, err := tmplFS.ReadFile(tmplPath)
+	fileBytes, err := tmplFS.ReadFile(tmplPath)
 	if err != nil {
 		return nil, err
 	}
 
 	// Parsing the tmpl bytes(file contents) to get the actual template.
-	tmpl, err := template.New(filepath.Base(tmplPath)).Parse(string(baseTmplBytes))
+	tmpl, err := template.New(filepath.Base(tmplPath)).Parse(string(fileBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -163,19 +181,13 @@ func createFileFromTemplate(fullWritePath string, tmpl *template.Template, data 
 // `fullWritePath`: The full path where the file will be created (e.g., "project/templates/index.html").
 // `templatePath`: The path of the static template file within the embedded filesystem.
 // `tmplFS`: The embedded filesystem containing the template files.
-func writeRawTemplateFile(fullWritePath, templatePath string, tmplFS embed.FS) error {
-	// Read the static file
-	fileBytes, err := tmplFS.ReadFile(templatePath)
-	if err != nil {
-		return err
-	}
-
+func writeRawTemplateFile(fullWritePath string, bytes []byte) error {
 	if err := CreateTargetDir(filepath.Dir(fullWritePath), false); err != nil {
 		return err
 	}
 
 	// Write the file directly
-	return os.WriteFile(fullWritePath, fileBytes, fs.ModePerm)
+	return os.WriteFile(fullWritePath, bytes, fs.ModePerm)
 }
 
 // createExamplePublicAsset takes a project dir path and creates a example public
@@ -201,4 +213,16 @@ func createExamplePublicAsset(projectDir string) error {
 	}
 
 	return nil
+}
+
+// skipProjectfiles retruns bool indicating whether a project file need to be skipped.
+// true -> need to be skipped.
+// false -> doesn't need to bes skipped.
+func skipProjectfiles(filePath string, cfg StackConfig) bool {
+	// Skip tailwind config if tailwind is not selected as  a CSS Strategy.
+	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind" {
+		return true
+	}
+
+	return false
 }

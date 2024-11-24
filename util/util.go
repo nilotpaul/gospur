@@ -53,6 +53,22 @@ func CreateTargetDir(path string, strict bool) error {
 	return nil
 }
 
+func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
+	return map[string]any{
+		"ModPath": modPath,
+		"UI": map[string]bool{
+			// CSS Strategy
+			"HasTailwind": cfg.CssStrategy == "Tailwind",
+
+			// CSS Library
+			"HasPreline": cfg.UILibrary == "Preline",
+		},
+		"Extras": map[string]bool{
+			"HasHTMX": contains(cfg.Extras, "HTMX"),
+		},
+	}
+}
+
 // doesTargetDirExistAndIsEmpty takes a `target` path, if it's
 // not a directory, not empty or doesn't exist then it'll return
 // false and an error, otherwise true and nil error.
@@ -75,4 +91,14 @@ func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// contains checks if a slice of string contains the given item.
+func contains(slice []string, item string) bool {
+	for _, v := range slice {
+		if v == item {
+			return true
+		}
+	}
+	return false
 }

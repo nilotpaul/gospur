@@ -17,6 +17,8 @@ type StackConfig struct {
 	// Echo, Fiber, etc...
 	WebFramework string
 
+	// CssStrategy can be tailwind, vanilla, etc.
+	CssStrategy string
 	// UI Library is pre-made styled libs like Preline.
 	UILibrary string
 
@@ -42,7 +44,6 @@ func GetStackConfig() (*StackConfig, error) {
 	// Framework options
 	frameworkPrompt := promptui.Select{
 		Label: "Choose a web framework",
-
 		Items: config.WebFrameworkOpts,
 	}
 	_, framework, err := frameworkPrompt.Run()
@@ -51,41 +52,60 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	cfg.WebFramework = framework
 
-	// UI Library Options
-	uiLibPrompt := promptui.Select{
-		Label: "Choose a UI Library",
-		Items: config.UILibraryOpts,
+	// CSS Strategy
+	extraPrompt := promptui.Select{
+		Label: "Choose a CSS Strategy",
+		Items: config.CssStrategyOpts,
 	}
-	_, uiLib, err := uiLibPrompt.Run()
+	_, css, err := extraPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to select web framework %v", err)
+		return nil, fmt.Errorf("Failed to select CSS Strategy %v", err)
 	}
-	cfg.UILibrary = uiLib
+	cfg.CssStrategy = css
+
+	// UI Library Options
+	// Filtering the opts for UI Libs based on the css strategy chosen.
+	filteredOpts := make([]string, 0)
+	for lib, deps := range config.UILibraryOpts {
+		if len(deps) == 0 {
+			filteredOpts = append(filteredOpts, lib)
+			continue
+		}
+		if contains(deps, cfg.CssStrategy) {
+			filteredOpts = append(filteredOpts, lib)
+		}
+	}
+	// Only ask anything if we have a compatible UI Lib for
+	// the chosen CSS Strategy.
+	if len(filteredOpts) != 0 {
+		// Asking for UI Lib if we've any filtered opts.
+		uiLibPrompt := promptui.Select{
+			Label: "Choose a UI Library",
+			Items: filteredOpts,
+		}
+		_, uiLib, err := uiLibPrompt.Run()
+		if err != nil {
+			return nil, fmt.Errorf("Failed to select UI Library %v", err)
+		}
+		cfg.UILibrary = uiLib
+	}
 
 	// Extra Add-Ons
-	extrasChosen := make([]string, 0)
+	extraChosen := make([]string, 0)
 	for _, extra := range config.ExtraOpts {
 		extraPrompt := promptui.Select{
 			Label: "Add " + extra,
 			Items: []string{"No", "Yes"},
 		}
-
-		// If Preline which depends on tailwind is selected as a UI Lib, we skip the
-		// current iteration and add tailwind in `extras` by default.
-		if extra == "Tailwind" && cfg.UILibrary == "Preline (requires tailwind)" {
-			extrasChosen = append(extrasChosen, "Tailwind")
-			continue
-		}
-
 		_, choice, err := extraPrompt.Run()
 		if err != nil {
 			return nil, fmt.Errorf("Failed to select extras %v", err)
 		}
 		if choice == "Yes" {
-			extrasChosen = append(extrasChosen, extra)
+			extraChosen = append(extraChosen, extra)
 		}
 	}
-	cfg.Extras = extrasChosen
+	cfg.Extras = extraChosen
 
 	return &cfg, nil
 }

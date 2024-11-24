@@ -1,15 +1,27 @@
 const { build } = require("esbuild");
+{{- if .UI.HasTailwind }}
+const { tailwindPlugin } = require("esbuild-plugin-tailwindcss");
+{{- end }}
 
 const b = () =>
   build({
     bundle: true,
     entryPoints: [
+      "web/styles/*",
+      {{- if .UI.HasPreline }}
       "node_modules/preline/preline.js",
+      {{- end }}
+      {{- if .Extras.HasHTMX }}
       "node_modules/htmx.org/dist/htmx.js",
+      {{- end }}
     ],
-    platform: "node",
+    {{- if .UI.HasTailwind }}
+    plugins: [tailwindPlugin()],
+    {{- end }}
+    entryNames: "[name]",
+    platform: "browser",
     outdir: "public/bundle",
-    loader: { ".node": "file" },
+    format: "cjs",
     minify: true,
   });
 
