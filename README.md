@@ -2,10 +2,25 @@
 
 A modern CLI Tool to bootstrap scalable web applications without hassling with JavaScript. It provides pre-configured developer tooling with no bloat, flexible for easy one step deployments.
 
+# What's better?
+
+- Only the necessary pre-configuration (full-control).
+- Auto JavaScript Bundling (Bring any npm library).
+- Very Fast Live Reload (server & browser).
+- `make dev` for dev and `make` for prod (one-click).
+- Extra options like tailwind, vanilla css, HTMX. 
+
+
 # Installation
 
 ```sh
-go install github.com/nilotpaul/gospur@latest
+go install -u github.com/nilotpaul/gospur@latest
+```
+
+or without installation
+
+```sh
+go run -u github.com/nilotpaul/gospur@latest init [project-name]
 ```
 
 # Usage
@@ -14,15 +29,15 @@ go install github.com/nilotpaul/gospur@latest
 gospur init [project-name]
 ```
 
-**Go Spur is WIP ⚒️, you'll get a default stack (Go + Echo + Tailwind + HTMX) for now.**
-
 # Docs
 
 Read detailed usage and examples of every stack configured.
 
 - [Go + Echo + Tailwind + HTMX](https://github.com/nilotpaul/gospur/tree/go-echo-tailwind-htmx)
 
-# Known Issues
+# Common Soon
 
-1. ~Black color used for text not visible in black background terminals. [#1](https://github.com/nilotpaul/gospur/issues/1)~
-2. ~When initialising a project in the current directory, it always says directory is not empty. [#2](https://github.com/nilotpaul/gospur/issues/3)~
+- More Framework Options.
+- Deployments strategies like docker.
+- Better templating with [templ](https://templ.guide) and [fiber](https://docs.gofiber.io) (django syntax).
+- Please suggest More 🙏🏼
