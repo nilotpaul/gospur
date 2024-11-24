@@ -17,13 +17,12 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 	}
 
 	// Building the stack config by talking user prompts.
-	var cfg util.StackConfig
 	stackCfg, err := util.GetStackConfig()
 	if err != nil {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}
-	cfg = *stackCfg
+	cfg := *stackCfg
 
 	// Asking for the go mod path from user.
 	goModPath, err := util.GetGoModulePath()
