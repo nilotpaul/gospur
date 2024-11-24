@@ -20,7 +20,7 @@ gospur init [project-name]
 
 Read detailed usage and examples of every stack configured.
 
-- [Go + Echo + Tailwind + HTMX](https://github.com/nilotpaul/gospur/tree/go-templates-htmx)
+- [Go + Echo + Tailwind + HTMX](https://github.com/nilotpaul/gospur/tree/go-echo-tailwind-htmx)
 
 # Known Issues
 
