@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/nilotpaul/gospur/config"
 	"github.com/spf13/cobra"
 )
 
@@ -10,8 +13,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:   "gospur",
 		Short: "Go Spur: Build web applications with Go, without the hassle of JavaScript",
-		Long: `Go Spur is a CLI tool that helps you quickly bootstrap Go web applications without worrying about JavaScript.
-With Go Spur, you can focus solely on the backend, while it handles the frontend tasks like bundling JavaScript libraries for you.`,
+		Long:  "Go Spur is a CLI tool that helps you quickly bootstrap Go web applications without worrying about JavaScript. Focus solely on the backend, while we handle the small repetitive tasks for you.",
 	}
 
 	// Project init command
@@ -25,6 +27,7 @@ With Go Spur, you can focus solely on the backend, while it handles the frontend
 )
 
 func Execute() error {
+	fmt.Println(config.LogoColoured)
 	return rootCmd.Execute()
 }
 
