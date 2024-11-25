@@ -1,5 +1,7 @@
 # Go Spur
 
+![GoSpur Logo](/assets/gospur.png)
+
 A modern CLI Tool to bootstrap scalable web applications without hassling with JavaScript. It provides pre-configured developer tooling with no bloat, flexible for easy one step deployments.
 
 # What's better?
