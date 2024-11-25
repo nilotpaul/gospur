@@ -1,4 +1,4 @@
-# Go Spur
+# GoSpur
 
 <img src="/assets/gospur.png" width="300" alt="GoSpur Logo" />
 
