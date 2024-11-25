@@ -1,6 +1,6 @@
 # Go Spur
 
-![GoSpur Logo](/assets/gospur.png)
+<img src="/assets/gospur.png" width="300" alt="GoSpur Logo" />
 
 A modern CLI Tool to bootstrap scalable web applications without hassling with JavaScript. It provides pre-configured developer tooling with no bloat, flexible for easy one step deployments.
 
