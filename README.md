@@ -20,7 +20,7 @@ go install -u github.com/nilotpaul/gospur@latest
 or without installation
 
 ```sh
-go run -u github.com/nilotpaul/gospur@latest init [project-name]
+go run github.com/nilotpaul/gospur@latest init [project-name]
 ```
 
 # Usage
