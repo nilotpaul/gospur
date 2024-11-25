@@ -35,11 +35,12 @@ gospur init [project-name]
 
 Read detailed usage and examples of every stack configured.
 
-- [Go + Echo + Tailwind + HTMX](https://github.com/nilotpaul/gospur/tree/go-echo-tailwind-htmx)
+- [Go + Echo + Templates](/docs/go-echo-templates.md)
 
 # Coming Soon
 
 - More Framework Options.
 - Deployments strategies like docker.
 - Better templating with [templ](https://templ.guide) and [fiber](https://docs.gofiber.io) (django syntax).
+- More examples and documentation.
 - Please suggest More 🙏🏼
