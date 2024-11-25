@@ -16,13 +16,13 @@ A modern CLI Tool to bootstrap scalable web applications without hassling with J
 # Installation
 
 ```sh
-go install -u github.com/nilotpaul/gospur@latest
+go install github.com/nilotpaul/gospur@main
 ```
 
 or without installation
 
 ```sh
-go run github.com/nilotpaul/gospur@latest init [project-name]
+go run github.com/nilotpaul/gospur@main init [project-name]
 ```
 
 # Usage
