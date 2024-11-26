@@ -26,11 +26,12 @@ jobs:
         run: go version
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v5.0.0
         with:
           distribution: goreleaser
           # Only minor and patch can be bumped.
           version: '~> v0'
           args: release --clean
+          workdir: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
