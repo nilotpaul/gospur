@@ -9,29 +9,25 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  goreleaser:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: [ '1.23.x' ]
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
+      -
+        name: Checkout
+        uses: actions/checkout@v4
         with:
-          go-version: ${{ matrix.go-version }}
-
-      - name: Display Go version
-        run: go version
-
-      - name: Run GoReleaser
+          fetch-depth: 0
+      -
+        name: Set up Go
+        uses: actions/setup-go@v5
+      -
+        name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
+
           distribution: goreleaser
-          # Only minor and patch can be bumped.
+          # 'latest', 'nightly', or a semver
           version: '~> v0'
           args: release
-          workdir: ./
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
