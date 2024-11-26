@@ -1,6 +1,10 @@
 package config
 
-import "github.com/manifoldco/promptui"
+import (
+	"fmt"
+
+	"github.com/manifoldco/promptui"
+)
 
 const Logo string = `
    _____       _____                  
@@ -14,3 +18,18 @@ const Logo string = `
 `
 
 var LogoColoured string = promptui.Styler(promptui.FGCyan, promptui.FGBold)(Logo)
+
+// GoSpur CLI version info
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
+func GetVersion() (string, error) {
+	if version == "dev" {
+		return "", fmt.Errorf("No version information available")
+	}
+
+	return version, nil
+}

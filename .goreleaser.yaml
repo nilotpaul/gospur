@@ -17,9 +17,9 @@ builds:
       - arm64
       - 386
     ldflags: |
-      -X main.version={{.Version}} 
-      -X main.commit={{.Commit}} 
-      -X main.date={{.Date}}
+      -X github.com/nilotpaul/gospur/config.version={{.Version}}
+      -X github.com/nilotpaul/gospur/config.commit={{.Commit}} 
+      -X github.com/nilotpaul/gospur/config.date={{.Date}}
 
 archives:
   - format: tar.gz

@@ -5,6 +5,9 @@ BINARY = $(BUILD_DIR)/gospur
 init: build
 	@$(BINARY) init
 
+version: build	
+	@$(BINARY) version
+
 # Development Commands
 run: build
 	@$(BINARY)
@@ -17,3 +20,7 @@ test:
 
 test-race:
 	@go test -v ./... --race
+
+# Only for local testing
+release:
+	@goreleaser release --snapshot --clean
