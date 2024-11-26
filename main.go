@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	// Starts the CLI
 	if err := Execute(); err != nil {
 		fmt.Println(config.ErrMsg("Go Spur exited"))
 		os.Exit(1)

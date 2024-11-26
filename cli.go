@@ -24,6 +24,15 @@ var (
 		Args:  cobra.MaximumNArgs(1),
 		Run:   handleInitCmd,
 	}
+
+	// Project version command
+	// On run -> gospur version.
+	versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "Shows the current installed version",
+		Args:  cobra.NoArgs,
+		Run:   handleVersionCmd,
+	}
 )
 
 func Execute() error {
@@ -32,5 +41,8 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(
+		initCmd,
+		versionCmd,
+	)
 }

@@ -1,0 +1,32 @@
+name: Integration Test for GoSpur CLI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.23.x' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Display Go version
+        run: go version
+
+      - name: Install Dependencies
+        run: go mod tidy
+      
+      - name: Run Tests
+        run: go test -v ./... --race
