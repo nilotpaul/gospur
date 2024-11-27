@@ -63,9 +63,9 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 func handleVersionCmd(cmd *cobra.Command, args []string) {
 	version, err := config.GetVersion()
 	if err != nil {
-		fmt.Println(config.ErrMsg(err))
+		fmt.Println("Version:", config.ErrMsg(err))
 		return
 	}
 
-	fmt.Println(config.NormalMsg("version: " + version))
+	fmt.Println("Version:", config.NormalMsg(version))
 }

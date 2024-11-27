@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"github.com/manifoldco/promptui"
 )
@@ -21,15 +22,27 @@ var LogoColoured string = promptui.Styler(promptui.FGCyan, promptui.FGBold)(Logo
 
 // GoSpur CLI version info
 var (
-	version = "dev"
-	commit  = "none"
-	date    = "unknown"
+	version string
+	commit  string
+	date    string
 )
 
 func GetVersion() (string, error) {
-	if version == "dev" {
-		return "", fmt.Errorf("No version information available")
+	noInfoErr := fmt.Errorf("No version information available")
+
+	// goreleaser has embeded the version via ldflags.
+	if len(version) != 0 {
+		return version, nil
 	}
 
-	return version, nil
+	// Try to get the version from the go.mod build info.
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "", noInfoErr
+	}
+	if info.Main.Version != "(devel)" {
+		return info.Main.Version, nil
+	}
+
+	return "", noInfoErr
 }
