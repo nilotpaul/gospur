@@ -8,9 +8,19 @@ import (
 
 var doneColor = promptui.Styler(promptui.FGGreen)
 
+type MultiSelect struct {
+	Label string
+	Items []string
+
+	// Size is the number of items that should appear on the select before scrolling is necessary.
+	// Defaults to 5.
+	Size int
+}
+
 // MultiSelect provides a prompt for selecting multiple items from a list of strings.
-func MultiSelect(items []string) ([]string, error) {
+func (ms MultiSelect) Run() ([]string, error) {
 	// Track selections as a map for O(1) updates
+	items := ms.Items
 	selected := make(map[int]bool)
 	cursor := 0
 
@@ -21,23 +31,16 @@ func MultiSelect(items []string) ([]string, error) {
 			if selected[i] {
 				displayItems[i] = fmt.Sprintf("%s %s", promptui.IconGood, item) // Selected
 			} else {
-				displayItems[i] = fmt.Sprintf("• %s", item) // Unselected
+				displayItems[i] = item // Unselected
 			}
 		}
-		displayItems[len(items)] = doneColor(fmt.Sprintf("• %s", "click here to continue"))
+		displayItems[len(items)] = doneColor("Click here to continue")
 
 		prompt := promptui.Select{
-			Label: "Select Items (Press Enter to toggle, ↓↑ to navigate, Done to finish):",
-			Items: displayItems,
-			Size:  5, // Only 5 visible items at a time
-			Templates: &promptui.SelectTemplates{
-				Label:    "{{ . }}",
-				Active:   "→ {{ . | cyan }}",
-				Inactive: "  {{ . }}",
-				Selected: "→ {{ . | green }}",
-			},
+			Label:        ms.Label,
+			Items:        displayItems,
+			Size:         ms.Size,
 			CursorPos:    cursor,
-			HideHelp:     true,
 			HideSelected: true,
 		}
 

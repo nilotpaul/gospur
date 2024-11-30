@@ -48,7 +48,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	_, framework, err := frameworkPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("failed to select web framework %v", err)
+		return nil, fmt.Errorf("failed to select web framework")
 	}
 	cfg.WebFramework = framework
 
@@ -59,7 +59,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	_, css, err := extraPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("failed to select CSS Strategy %v", err)
+		return nil, fmt.Errorf("failed to select CSS Strategy")
 	}
 	cfg.CssStrategy = css
 
@@ -85,27 +85,21 @@ func GetStackConfig() (*StackConfig, error) {
 		}
 		_, uiLib, err := uiLibPrompt.Run()
 		if err != nil {
-			return nil, fmt.Errorf("failed to select UI Library %v", err)
+			return nil, fmt.Errorf("failed to select UI Library")
 		}
 		cfg.UILibrary = uiLib
 	}
 
 	// Extra Add-Ons
-	extraChosen := make([]string, 0)
-	for _, extra := range config.ExtraOpts {
-		extraPrompt := promptui.Select{
-			Label: "Add " + extra,
-			Items: []string{"No", "Yes"},
-		}
-		_, choice, err := extraPrompt.Run()
-		if err != nil {
-			return nil, fmt.Errorf("failed to select extras %v", err)
-		}
-		if choice == "Yes" {
-			extraChosen = append(extraChosen, extra)
-		}
+	extraOptsPrompt := MultiSelect{
+		Label: "Choose one or many extra options",
+		Items: config.ExtraOpts,
 	}
-	cfg.Extras = extraChosen
+	extras, err := extraOptsPrompt.Run()
+	if err != nil {
+		return nil, fmt.Errorf("failed to select extra options")
+	}
+	cfg.Extras = extras
 
 	return &cfg, nil
 }
