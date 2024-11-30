@@ -14,7 +14,7 @@ dev:
     -file=.html \
 	-file=.css \
 	-xdir=public \
-	go build -tags 'dev' -o bin/build main.go \
+	go build -tags 'dev' -o bin/build . \
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
     :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
-	:: wgo -dir=node_modules npx livereload public
+	:: wgo -dir=node_modules npx livereload -w 400 public
