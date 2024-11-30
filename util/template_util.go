@@ -42,7 +42,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, tmplFS)
 		if err != nil {
-			return fmt.Errorf("Template Parsing Error (pls report): %v", err)
+			return fmt.Errorf("template Parsing Error (pls report): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -53,7 +53,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		)
 		if err != nil {
 			return fmt.Errorf(
-				"Failed to create file -> '%s' due to %v",
+				"failed to create file -> '%s' due to %v",
 				processedTmpl.targetFilePath,
 				err,
 			)
@@ -74,7 +74,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		// actual `template` itself.
 		processedTmpl, err := parseTemplate(targetFilePath, templatePath, tmplFS)
 		if err != nil {
-			return fmt.Errorf("Template Parsing Error (pls report): %v", err)
+			return fmt.Errorf("template Parsing Error (pls report): %v", err)
 		}
 
 		// Creating the file with the parsed template.
@@ -85,7 +85,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		)
 		if err != nil {
 			return fmt.Errorf(
-				"Failed to create file -> '%s' due to %v",
+				"failed to create file -> '%s' due to %v",
 				processedTmpl.targetFilePath,
 				err,
 			)
@@ -112,7 +112,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		// Creating the file with the raw template.
 		if err := writeRawTemplateFile(targetFilePath, fileBytes); err != nil {
 			return fmt.Errorf(
-				"Failed to create file -> '%s' due to %v",
+				"failed to create file -> '%s' due to %v",
 				targetFilePath,
 				err,
 			)
@@ -121,7 +121,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 
 	// Create an example public asset
 	if err := createExamplePublicAsset(targetDir); err != nil {
-		return fmt.Errorf("Failed to create the public directory %v", err)
+		return fmt.Errorf("failed to create the public directory %v", err)
 	}
 
 	return nil

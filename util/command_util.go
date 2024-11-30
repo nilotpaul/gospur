@@ -48,7 +48,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	_, framework, err := frameworkPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to select web framework %v", err)
+		return nil, fmt.Errorf("failed to select web framework %v", err)
 	}
 	cfg.WebFramework = framework
 
@@ -59,7 +59,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 	_, css, err := extraPrompt.Run()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to select CSS Strategy %v", err)
+		return nil, fmt.Errorf("failed to select CSS Strategy %v", err)
 	}
 	cfg.CssStrategy = css
 
@@ -85,7 +85,7 @@ func GetStackConfig() (*StackConfig, error) {
 		}
 		_, uiLib, err := uiLibPrompt.Run()
 		if err != nil {
-			return nil, fmt.Errorf("Failed to select UI Library %v", err)
+			return nil, fmt.Errorf("failed to select UI Library %v", err)
 		}
 		cfg.UILibrary = uiLib
 	}
@@ -99,7 +99,7 @@ func GetStackConfig() (*StackConfig, error) {
 		}
 		_, choice, err := extraPrompt.Run()
 		if err != nil {
-			return nil, fmt.Errorf("Failed to select extras %v", err)
+			return nil, fmt.Errorf("failed to select extras %v", err)
 		}
 		if choice == "Yes" {
 			extraChosen = append(extraChosen, extra)
@@ -119,7 +119,7 @@ func GetGoModulePath() (string, error) {
 	}
 	path, err := pathPrompt.Run()
 	if err != nil {
-		return "", fmt.Errorf("Error getting the mod path %v", err)
+		return "", fmt.Errorf("error getting the mod path %v", err)
 	}
 
 	return path, nil
@@ -131,7 +131,7 @@ func GetGoModulePath() (string, error) {
 func RunGoModInit(fullProjectPath, name string) error {
 	// Change the current working directory to the project directory
 	if err := os.Chdir(fullProjectPath); err != nil {
-		return fmt.Errorf("Failed to change to project directory: %v", err)
+		return fmt.Errorf("failed to change to project directory: %v", err)
 	}
 
 	cmd := exec.Command("go", "mod", "init", name)
@@ -156,7 +156,7 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("Error getting the current working directory %v", err)
+		return nil, fmt.Errorf("error getting the current working directory %v", err)
 	}
 
 	fullPath := filepath.Join(cwd, targetPath)
@@ -170,11 +170,11 @@ func PrintSuccessMsg(path string) {
 
 	// Post installation instructions
 	if path == "." {
-		fmt.Println(config.FaintMsg(fmt.Sprintf(`
+		fmt.Println(config.FaintMsg(`
 go install github.com/bokwoon95/wgo@latest
 go mod tidy
 npm install
-`)))
+`))
 	} else {
 		fmt.Println(config.FaintMsg(fmt.Sprintf(`
 cd %s
@@ -188,19 +188,19 @@ npm install
 
 func validateGoModPath(path string) error {
 	if len(path) < 3 {
-		return fmt.Errorf("Path cannot be less than 3 character(s)")
+		return fmt.Errorf("path cannot be less than 3 character(s)")
 	}
 	// Starts with https://
 	if strings.HasPrefix(path, "https://") {
-		return fmt.Errorf("Invalid path '%s', should not contain https", path)
+		return fmt.Errorf("invalid path '%s', should not contain https", path)
 	}
 	// Contains any of these -> :*?|
 	if strings.ContainsAny(path, " :*?|") {
-		return fmt.Errorf("Invalid path '%s', contains reserved characters", path)
+		return fmt.Errorf("invalid path '%s', contains reserved characters", path)
 	}
 	// Length exceedes 255 character(s)
 	if len(path) > 255 {
-		return fmt.Errorf("Exceeded maximum length")
+		return fmt.Errorf("exceeded maximum length")
 	}
 
 	return nil
