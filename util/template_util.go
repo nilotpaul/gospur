@@ -215,9 +215,9 @@ func createExamplePublicAsset(projectDir string) error {
 	return nil
 }
 
-// skipProjectfiles retruns bool indicating whether a project file need to be skipped.
+// skipProjectfiles returns bool indicating whether a project file need to be skipped.
 // true -> need to be skipped.
-// false -> doesn't need to bes skipped.
+// false -> doesn't need to be skipped.
 func skipProjectfiles(filePath string, cfg StackConfig) bool {
 	// Skip tailwind config if tailwind is not selected as  a CSS Strategy.
 	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind" {
