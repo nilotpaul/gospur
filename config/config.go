@@ -10,20 +10,7 @@ var (
 	FaintMsg   = promptui.Styler(promptui.FGFaint)
 )
 
-// UILibrary represents an UI Library and `DependsOn`
-// which means it can depend on any chosen CSS Strategy (framework).
-type (
-	ProjectCtx map[string]any
-
-	UILibrary struct {
-		// Name of the UI Library
-		Name string
-
-		// An UI Library can depend on any chosen CSS Strategy.
-		// If it's independent, `DependsOn` should be an empty string.
-		DependsOn string
-	}
-)
+type ProjectCtx map[string]any
 
 // Prompt options.
 var (
@@ -32,6 +19,7 @@ var (
 	}
 	ExtraOpts = []string{
 		"HTMX",
+		"Dockerfile",
 	}
 
 	CssStrategyOpts = []string{
@@ -54,6 +42,8 @@ var (
 		"esbuild.config.js":      "base/esbuild.config.js.tmpl",
 		"package.json":           "base/package.json.tmpl",
 		"tailwind.config.js":     "base/tailwind.config.js.tmpl",
+		"Dockerfile":             "base/.dockerfile.tmpl",
+		".dockerignore":          "base/.dockerignore.tmpl",
 		"main.go":                "base/main.go.tmpl",
 	}
 

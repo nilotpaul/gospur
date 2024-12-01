@@ -1,11 +1,11 @@
 start: 
 	@node ./esbuild.config.js
-	@ENVIRONMENT=PRODUCTION go build -tags '!dev' -o bin/build
+	@go build -tags '!dev' -o bin/build
 	@ENVIRONMENT=PRODUCTION ./bin/build
 
 build:
 	@node ./esbuild.config.js
-	@ENVIRONMENT=DEVELOPMENT go build -tags 'dev' -o bin/build
+	@go build -tags 'dev' -o bin/build
 
 dev:
 	@wgo \

@@ -219,8 +219,12 @@ func createExamplePublicAsset(projectDir string) error {
 // true -> need to be skipped.
 // false -> doesn't need to be skipped.
 func skipProjectfiles(filePath string, cfg StackConfig) bool {
-	// Skip tailwind config if tailwind is not selected as  a CSS Strategy.
+	// Skip tailwind config if tailwind is not selected as a CSS Strategy.
 	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind" {
+		return true
+	}
+	// Skip Dockerfile and dockerignore if not selected in extra options.
+	if (filePath == "Dockerfile" || filePath == ".dockerignore") && !contains(cfg.ExtraOpts, "Dockerfile") {
 		return true
 	}
 
