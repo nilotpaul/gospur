@@ -64,7 +64,7 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 			"HasPreline": cfg.UILibrary == "Preline",
 		},
 		"Extras": map[string]bool{
-			"HasHTMX": contains(cfg.Extras, "HTMX"),
+			"HasHTMX": contains(cfg.ExtraOpts, "HTMX"),
 		},
 	}
 }

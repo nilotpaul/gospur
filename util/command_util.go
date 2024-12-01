@@ -23,7 +23,7 @@ type StackConfig struct {
 	UILibrary string
 
 	// Extras are extra add-ons like css lib, HTMX etc.
-	Extras []string
+	ExtraOpts []string
 }
 
 // ProjectPath represents destination or location
@@ -95,11 +95,11 @@ func GetStackConfig() (*StackConfig, error) {
 		Label: "Choose one or many extra options",
 		Items: config.ExtraOpts,
 	}
-	extras, err := extraOptsPrompt.Run()
+	opts, err := extraOptsPrompt.Run()
 	if err != nil {
 		return nil, fmt.Errorf("failed to select extra options")
 	}
-	cfg.Extras = extras
+	cfg.ExtraOpts = opts
 
 	return &cfg, nil
 }

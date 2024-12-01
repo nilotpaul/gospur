@@ -137,7 +137,7 @@ func generateErrorHTMLBody(cfg StackConfig) string {
 func generateHeadScripts(cfg StackConfig) string {
 	scripts := []string{"<!-- Bundled Javascript -->"}
 
-	if contains(cfg.Extras, "HTMX") {
+	if contains(cfg.ExtraOpts, "HTMX") {
 		scripts = append(scripts, `<script defer src="public/bundle/htmx.js"></script>`)
 	}
 	if cfg.UILibrary == "Preline" {

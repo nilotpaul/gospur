@@ -1,0 +1,47 @@
+# Using a node base image
+FROM node:20-alpine AS bundler
+
+WORKDIR /app
+
+# Coping the project in /app
+COPY . .
+
+# Installing node dependencies
+RUN npm install
+# Bundling, output -> public/bundle
+RUN node ./esbuild.config.js && rm -rf node_modules
+
+# Using Go base image
+FROM golang:1.23-alpine AS builder
+ENV GO111MODULE=on
+
+WORKDIR /app
+
+# Copying the project with bundled assets from previous stage
+COPY --from=bundler /app .
+
+# Insallting Go modules
+RUN go mod download
+# Built binary will be saved to bin/build
+RUN go build -tags '!dev' -o bin/build
+
+# Using scratch base image
+FROM scratch
+
+WORKDIR /app
+
+# Copying the binary and bundled assets
+COPY --from=builder --chown=1000:1000 /app/bin /app/bin
+COPY --from=builder --chown=1000:1000 /app/public /app/public
+COPY --from=builder --chown=1000:1000 /app/web /app/web
+
+# Switch to the non-root user
+USER 1000:1000
+
+# Setting up necessary environment variables
+ENV ENVIRONMENT="PRODUCTION"
+ENV PORT="3000"
+
+EXPOSE $PORT
+
+CMD [ "./bin/build" ]
