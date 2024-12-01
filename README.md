@@ -37,10 +37,25 @@ Read detailed usage and examples of every stack configured.
 
 - [Go + Echo + Templates](/docs/go-echo-templates.md)
 
+# Configuration Options
+
+## Web Framework  
+- Echo  
+
+## CSS  
+- Vanilla CSS  
+- Tailwind
+
+## UI Library  
+- Preline  
+
+## Extra Options  
+- HTMX  
+- Dockerfile
+
 # Coming Soon
 
 - More Framework Options.
-- Deployments strategies like docker.
 - Better templating with [templ](https://templ.guide) and [fiber](https://docs.gofiber.io) (django syntax).
 - More examples and documentation.
 - Please suggest More 🙏🏼
