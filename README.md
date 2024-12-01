@@ -39,17 +39,17 @@ Read detailed usage and examples of every stack configured.
 
 # Configuration Options
 
-## Web Framework  
+**Web Framework**
 - Echo  
 
-## CSS  
+**Styling**
 - Vanilla CSS  
 - Tailwind
 
-## UI Library  
+**UI Library** 
 - Preline  
 
-## Extra Options  
+**Extra Options**
 - HTMX  
 - Dockerfile
 
