@@ -4,6 +4,7 @@
 
 A modern CLI Tool to bootstrap scalable web applications without hassling with JavaScript. It provides pre-configured developer tooling with no bloat, flexible for easy one step deployments.
 
+
 # What's better?
 
 - Only the necessary pre-configuration (full-control).
@@ -48,6 +49,7 @@ Read detailed usage and examples of every stack configured.
 
 **UI Library** 
 - Preline  
+- DaisyUI
 
 **Extra Options**
 - HTMX  
