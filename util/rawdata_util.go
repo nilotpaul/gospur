@@ -22,9 +22,7 @@ const (
   </main>
 </body>`
 	tailwindHomeBodyExampleHTML = `
-  <body
-    class="max-w-full bg-gray-300 dark:text-slate-200 text-black dark:bg-gray-950"
-  >
+  <body>
     <!-- Container (MAX-WIDTH -> 48rem) -->
     <main class="max-w-3xl mx-auto">
       <div class="flex items-center gap-y-6 mt-4 flex-col justify-center">

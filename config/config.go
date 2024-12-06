@@ -28,6 +28,7 @@ var (
 	}
 	UILibraryOpts = map[string][]string{
 		"Preline": {"Tailwind"},
+		"DaisyUI": {"Tailwind"},
 	}
 )
 
