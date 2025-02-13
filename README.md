@@ -26,6 +26,11 @@ or without installation
 go run github.com/nilotpaul/gospur@latest init [project-name]
 ```
 
+or download prebuilt binary
+
+- [Download from here](https://github.com/nilotpaul/gospur/releases/latest)
+- Extract and run `./gospur init`
+
 # Usage
 
 ```
