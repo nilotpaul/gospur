@@ -1,0 +1,52 @@
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"html/template"
+	"io/fs"
+	"path/filepath"
+
+	"github.com/labstack/echo/v4"
+)
+
+//go:embed public/*
+var publicFS embed.FS
+
+//go:embed web/*
+var templateFS embed.FS
+
+func ServeStatic(e *echo.Echo) *echo.Route {
+	root := "public"
+	return e.StaticFS("/public", echo.MustSubFS(publicFS, root))
+}
+
+// parseTemplates takes a embed.FS where html files will reside.
+// It'll check nested dirs and load all files with .html ext.
+func parseTemplates() (*template.Template, error) {
+	var (
+		tmpl = template.New("")
+		root = "."
+	)
+
+	err := fs.WalkDir(templateFS, root, func(path string, d fs.DirEntry, err error) error {
+		if err == nil {
+			if !d.IsDir() && filepath.Ext(path) == ".html" {
+				_, err := tmpl.ParseFS(templateFS, path)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return err
+	})
+
+	return tmpl, err
+}
+
+func LoadTemplates(*echo.Echo) *template.Template {
+	return template.Must(parseTemplates())
+}

@@ -12,6 +12,10 @@ func main() {
 	env := config.MustloadEnv()
 
 	// API Server
-	server := api.NewAPIServer(*env)
+	server := api.NewAPIServer(*env, api.ServerConfig{
+		ServeStatic:   ServeStatic,
+		LoadTemplates: LoadTemplates,
+	})
+
 	log.Fatal(server.Start())
 }

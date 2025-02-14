@@ -43,6 +43,8 @@ var (
 		"esbuild.config.js":      "base/esbuild.config.js.tmpl",
 		"package.json":           "base/package.json.tmpl",
 		"tailwind.config.js":     "base/tailwind.config.js.tmpl",
+		"build_dev.go":           "base/build_dev.go.tmpl",
+		"build_prod.go":          "base/build_prod.go.tmpl",
 		"Dockerfile":             "base/.dockerfile.tmpl",
 		".dockerignore":          "base/.dockerignore.tmpl",
 		"main.go":                "base/main.go.tmpl",

@@ -1,0 +1,50 @@
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"html/template"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+)
+
+func ServeStatic(e *echo.Echo) *echo.Route {
+	return e.Static("/public", "public")
+}
+
+// parseTemplates takes a directory where html files will reside.
+// It'll check nested dirs and load all files with .html ext.
+func parseTemplates() (*template.Template, error) {
+	var (
+		tmpl = template.New("")
+		dir  = "web"
+	)
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err == nil {
+			if strings.Contains(path, ".html") {
+				_, err = tmpl.ParseFiles(path)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return err
+	})
+
+	return tmpl, err
+}
+
+func LoadTemplates(e *echo.Echo) *template.Template {
+	tmpls, err := parseTemplates()
+	if err != nil {
+		e.Logger.Error(err)
+	}
+
+	return tmpls
+}
