@@ -44,10 +44,20 @@ make
 You only need:
 
 - The built binary in `bin` folder.
-- The bundled assets in `public` folder.
-- Dockerfile coming soon 🔜.
 
-# How easy is it to use?
+> **Note: All the assets in `public` and `web` folder will be embedded in the binary.**
+
+- Commands to build for production:
+```sh
+build cmd:
+node ./esbuild.config.js
+go build -tags '!dev' -o bin/build
+
+run cmd: 
+ENVIRONMENT=PRODUCTION ./bin/build
+```
+
+# How easy it is to use?
 
 ```go
 func handleGetHome(c echo.Context) error {
