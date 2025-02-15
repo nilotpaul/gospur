@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -56,6 +57,7 @@ func CreateTargetDir(path string, strict bool) error {
 func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 	return map[string]any{
 		"ModPath": modPath,
+		"IsLinux": strings.Split(runtime.GOOS, "/")[0] == "linux",
 		"UI": map[string]bool{
 			// CSS Strategy
 			"HasTailwind": cfg.CssStrategy == "Tailwind",

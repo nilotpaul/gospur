@@ -14,6 +14,7 @@ run: build
 
 build: 
 	@go build -o $(BINARY) .
+	@GOOS=windows GOARCH=amd64 go build -o $(BINARY).exe . 
 
 test:
 	@go test -v ./...

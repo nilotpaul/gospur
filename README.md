@@ -41,7 +41,11 @@ gospur init [project-name]
 
 Read detailed usage and examples of every stack configured.
 
+**(Stacks)**
 - [Go + Echo + Templates](/docs/go-echo-templates.md)
+
+**(Others)**
+- [Development Usage](/docs/development-usage.md)
 
 # Configuration Options
 
