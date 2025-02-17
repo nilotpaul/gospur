@@ -1,3 +1,4 @@
+{{- if .Web.IsEcho -}}
 //go:build !dev
 // +build !dev
 
@@ -50,3 +51,42 @@ func parseTemplates() (*template.Template, error) {
 func LoadTemplates(*echo.Echo) *template.Template {
 	return template.Must(parseTemplates())
 }
+{{- else if .Web.IsFiber -}}
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"io/fs"
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/template/html/v2"
+)
+
+//go:embed public/*
+var publicFS embed.FS
+
+//go:embed web/*
+var templateFS embed.FS
+
+func ServeStatic(app *fiber.App) fiber.Router {
+	root := "public"
+	return app.Use("/public", filesystem.New(filesystem.Config{
+		PathPrefix: root,
+		Root:       http.FS(publicFS),
+	}))
+}
+
+func LoadTemplates() *html.Engine {
+	subFS, err := fs.Sub(templateFS, "web")
+	if err != nil {
+		panic(err)
+	}
+
+	return html.NewFileSystem(http.FS(subFS), ".html")
+}
+{{- end -}}

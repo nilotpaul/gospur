@@ -1,0 +1,21 @@
+package api
+
+import (
+	"{{ .ModPath }}/config"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type Routes struct {
+	env config.EnvConfig
+}
+
+func NewRouter(env config.EnvConfig) *Routes {
+	return &Routes{
+		env: env,
+	}
+}
+
+func (r *Routes) RegisterRoutes(router fiber.Router) {
+	router.Add("GET", "/", handleGetHome)
+}
