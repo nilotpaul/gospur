@@ -58,6 +58,10 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 	return map[string]any{
 		"ModPath": modPath,
 		"IsLinux": strings.Split(runtime.GOOS, "/")[0] == "linux",
+		"Web": map[string]bool{
+			"IsEcho":  cfg.WebFramework == "Echo",
+			"IsFiber": cfg.WebFramework == "Fiber",
+		},
 		"UI": map[string]bool{
 			// CSS Strategy
 			"HasTailwind": cfg.CssStrategy == "Tailwind",
@@ -104,4 +108,13 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+func removeLinesStartEnd(s string, start, end int) string {
+	lines := strings.Split(s, "\n")
+	if len(lines) > 2 {
+		lines = lines[start : len(lines)-end]
+	}
+
+	return strings.Join(lines, "\n")
 }

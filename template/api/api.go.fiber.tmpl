@@ -1,0 +1,86 @@
+package api
+
+import (
+	"io"
+	"log"
+	"strings"
+
+	"{{ .ModPath }}/config"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/template/html/v2"
+)
+
+type ServerConfig struct {
+	// Serving static assets from `public` folder.
+	ServeStatic func(*fiber.App) fiber.Router
+
+	// LoadTemplates will return the executed html templates.
+	LoadTemplates func() *html.Engine
+}
+
+type APIServer struct {
+	listenAddr string
+	env        config.EnvConfig
+	ServerConfig
+}
+
+func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+	return &APIServer{
+		listenAddr:   ":" + env.PORT,
+		env:          env,
+		ServerConfig: cfg,
+	}
+}
+
+type TemplatesEngine struct {
+	engine *html.Engine
+	isDev  bool
+}
+
+func (t *TemplatesEngine) Load() error {
+	return t.engine.Load()
+}
+
+// Overriding `Render` func
+func (t *TemplatesEngine) Render(w io.Writer, name string, data interface{}, layouts ...string) error {
+	return t.engine.Render(w, name, map[string]any{"IsDev": t.isDev, "Ctx": data}, layouts...)
+}
+
+// Start will run the API Server
+// Any global middlewares like Logger should be registered here.
+func (api *APIServer) Start() error {
+	engine := api.LoadTemplates()
+
+	app := fiber.New(fiber.Config{
+		ErrorHandler: HTTPErrorHandler,
+		Views:        &TemplatesEngine{engine: engine, isDev: !api.env.IsProduction()},
+		ViewsLayout:  "layouts/Root",
+	})
+
+	// Global Middlewares
+	api.registerGlobalMiddlewares(app)
+
+	// Routes
+	r := NewRouter(api.env)
+	r.RegisterRoutes(app)
+
+	log.Printf("Visit http://localhost%s", api.listenAddr)
+
+	return app.Listen(api.listenAddr)
+}
+
+// Extend the list of global middlewares as needed.
+func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
+	app.Use(recover.New())
+	app.Use(logger.New(logger.Config{
+		Next: func(c *fiber.Ctx) bool {
+			// Skipping Logging of public assets.
+			return strings.HasPrefix(c.Path(), "/public")
+		},
+	}))
+
+	api.ServeStatic(app)
+}

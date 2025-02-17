@@ -1,3 +1,4 @@
+{{- if .Web.IsEcho -}}
 //go:build dev
 // +build dev
 
@@ -48,3 +49,22 @@ func LoadTemplates(e *echo.Echo) *template.Template {
 
 	return tmpls
 }
+{{- else if .Web.IsFiber -}}
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
+)
+
+func ServeStatic(app *fiber.App) fiber.Router {
+	return app.Static("/public", "public")
+}
+
+func LoadTemplates() *html.Engine {
+	return html.New("web", ".html")
+}
+{{- end -}}

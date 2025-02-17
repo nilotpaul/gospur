@@ -24,12 +24,7 @@ type processTemplate struct {
 // It creates the necessary folders and files for the entire project.
 func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	// Ranging over files in base dir which doesn't depend on `StackConfig`
-	for targetPath, templatePath := range config.ProjectBaseFiles {
-		// Skip to the next iteration if `skipProjectfiles` returns true.
-		if skip := skipProjectfiles(targetPath, cfg); skip {
-			continue
-		}
-
+	for targetPath, templatePath := range preprocessBaseFiles(cfg) {
 		// Getting the embeded folder containing all base template files.
 		tmplFS := tmpls.GetBaseFiles()
 
@@ -61,7 +56,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	}
 
 	// Ranging over files in API dir which depend on `StackConfig`.
-	for targetPath, templatePath := range config.ProjectAPIFiles {
+	for targetPath, templatePath := range preprocessAPIFiles(cfg) {
 		// Getting the embeded folder containing all API template files.
 		tmplFS := tmpls.GetAPIFiles()
 
@@ -96,7 +91,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	//
 	// These needs to be processed seperately as it needs to be written
 	// as template files itself, thus parsing isn't required.
-	for targetPath := range config.ProjectPageFiles {
+	for targetPath := range preprocessPageFiles(cfg) {
 		var (
 			paths = strings.Split(targetPath, "/")
 			name  = paths[len(paths)-1]
@@ -215,9 +210,59 @@ func createExamplePublicAsset(projectDir string) error {
 	return nil
 }
 
+// preprocessAPIFiles takes `StackConfig` and processes the Base Files to
+// strip, exclude any unnecessary files or configuration based on the `StackConfig`.
+func preprocessAPIFiles(cfg StackConfig) config.ProjectFiles {
+	parsedApiFiles := make(config.ProjectFiles, 0)
+	for target, paths := range config.ProjectAPIFiles {
+		var templatePath string
+		for _, path := range paths {
+			parts := strings.Split(path, ".")
+			frameworkFromFileName := parts[len(parts)-2]
+			if strings.ToLower(cfg.WebFramework) == frameworkFromFileName {
+				templatePath = path
+			}
+		}
+		parsedApiFiles[target] = templatePath
+	}
+
+	return parsedApiFiles
+}
+
+// preprocessAPIFiles takes `StackConfig` and processes the API Files to
+// strip, exclude any unnecessary files or configuration based on the `StackConfig`.
+func preprocessBaseFiles(cfg StackConfig) config.ProjectFiles {
+	parsedBaseFiles := make(config.ProjectFiles, 0)
+	for target, path := range config.ProjectBaseFiles {
+		if skip := skipProjectfiles(target, cfg); skip {
+			continue
+		}
+		parsedBaseFiles[target] = path
+	}
+
+	return parsedBaseFiles
+}
+
+// preprocessAPIFiles takes `StackConfig` and processes the API Files to
+// strip, exclude any unnecessary files or configuration based on the `StackConfig`.
+func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
+	parsedBaseFiles := make(config.ProjectFiles, 0)
+	for target, path := range config.ProjectPageFiles {
+		// Skip layouts dir if not supported.
+		if strings.HasPrefix(target, "web/layouts") && cfg.WebFramework != "Fiber" {
+			continue
+		}
+		parsedBaseFiles[target] = path
+	}
+
+	return parsedBaseFiles
+}
+
 // skipProjectfiles returns bool indicating whether a project file need to be skipped.
 // true -> need to be skipped.
 // false -> doesn't need to be skipped.
+//
+// Info: Should be only valid for Base Files.
 func skipProjectfiles(filePath string, cfg StackConfig) bool {
 	// Skip tailwind config if tailwind is not selected as a CSS Strategy.
 	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind" {

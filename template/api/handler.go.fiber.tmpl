@@ -1,0 +1,35 @@
+package api
+
+import (
+	"strings"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+func HTTPErrorHandler(c *fiber.Ctx, err error) error {
+	var (
+		status  int    = 500
+		msg     string = "Internal Server Error"
+		fullErr string = "Something Went Wrong"
+	)
+	if he, ok := err.(*fiber.Error); ok {
+		status = he.Code
+		msg = he.Message
+		fullErr = he.Error()
+	}
+
+	// If the path is prefixed with `/api/json`, send a JSON Response Back.
+	// Otherwise, render a Error HTML Page.
+	if strings.HasPrefix(c.Path(), "/api/json") {
+		return c.Status(status).JSON(map[string]any{"status": status, "error": msg})
+	} else {
+		return c.Status(status).Render("Error", map[string]any{"Msg": msg, "FullError": fullErr})
+	}
+}
+
+func handleGetHome(c *fiber.Ctx) error {
+	return c.Render("Home", map[string]any{
+		"Title": "GoSpur Stack",
+		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
+	})
+}
