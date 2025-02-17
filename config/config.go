@@ -10,12 +10,18 @@ var (
 	FaintMsg   = promptui.Styler(promptui.FGFaint)
 )
 
-type ProjectCtx map[string]any
+// ProjectFiles describes the structure of files to be read as templates
+// from `.tmpl` files and written to their target.
+//
+// `Key` corrosponds to the read location.
+// `Value` corrosponds to the write location.
+type ProjectFiles map[string]string
 
 // Prompt options.
 var (
 	WebFrameworkOpts = []string{
 		"Echo",
+		"Fiber",
 	}
 	ExtraOpts = []string{
 		"HTMX",
@@ -57,9 +63,9 @@ var (
 		"web/Error.html": "",
 	}
 
-	ProjectAPIFiles = map[string]string{
-		"api/api.go":     "api/api.go.echo.tmpl",
-		"api/route.go":   "api/route.go.echo.tmpl",
-		"api/handler.go": "api/handler.go.echo.tmpl",
+	ProjectAPIFiles = map[string][]string{
+		"api/api.go":     {"api/api.go.echo.tmpl", "api/api.go.fiber.tmpl"},
+		"api/route.go":   {"api/route.go.echo.tmpl", "api/route.go.fiber.tmpl"},
+		"api/handler.go": {"api/handler.go.echo.tmpl", "api/handler.go.fiber.tmpl"},
 	}
 )
