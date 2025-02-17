@@ -91,7 +91,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	//
 	// These needs to be processed seperately as it needs to be written
 	// as template files itself, thus parsing isn't required.
-	for targetPath := range config.ProjectPageFiles {
+	for targetPath := range preprocessPageFiles(cfg) {
 		var (
 			paths = strings.Split(targetPath, "/")
 			name  = paths[len(paths)-1]
@@ -235,6 +235,21 @@ func preprocessBaseFiles(cfg StackConfig) config.ProjectFiles {
 	parsedBaseFiles := make(config.ProjectFiles, 0)
 	for target, path := range config.ProjectBaseFiles {
 		if skip := skipProjectfiles(target, cfg); skip {
+			continue
+		}
+		parsedBaseFiles[target] = path
+	}
+
+	return parsedBaseFiles
+}
+
+// preprocessAPIFiles takes `StackConfig` and processes the API Files to
+// strip, exclude any unnecessary files or configuration based on the `StackConfig`.
+func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
+	parsedBaseFiles := make(config.ProjectFiles, 0)
+	for target, path := range config.ProjectPageFiles {
+		// Skip layouts dir if not supported.
+		if strings.HasPrefix(target, "web/layouts") && cfg.WebFramework != "Fiber" {
 			continue
 		}
 		parsedBaseFiles[target] = path

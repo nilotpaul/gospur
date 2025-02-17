@@ -109,3 +109,12 @@ func contains(slice []string, item string) bool {
 	}
 	return false
 }
+
+func removeLinesStartEnd(s string, start, end int) string {
+	lines := strings.Split(s, "\n")
+	if len(lines) > 2 {
+		lines = lines[start : len(lines)-end]
+	}
+
+	return strings.Join(lines, "\n")
+}
