@@ -1,105 +1,41 @@
-# Ultimate Golang Stack
+# This project was bootstraped with GoSpur CLI
+- [GoSpur Docs](https://github.com/nilotpaul/gospur#docs)
 
-**Build scalable full-stack solutions using just Go without hassling with JS.**
-
-This is a minimal project template designed to be highly configurable for your requirements. It includes only two essential dependency.
-
-# Features
-
-- Auto server & browser reload (like HMR).
-- [TailwindCSS](https://tailwindcss.com) & [Preline](https://preline.co) pre-configured for building modern UIs.
-- [HTMX](https://htmx.org) for enhanced HTML interactivity.
-- Bundling JavaScript with [esbuild](https://esbuild.github.io) (No third-party CDNs).
-- To run in production, all you need is `bin` and `public` folder.
-
-# Prerequisites
-
-- Go
-- Node.js with your preferred package manager (e.g., npm, yarn, or pnpm)
-- [wgo](https://github.com/bokwoon95/wgo) for live server reload.
-
-# Installation
-
-**After cloing the repo run these:**
-
-```sh
-# Needed for live reload
-go install github.com/bokwoon95/wgo@latest
-# Install node Deps
-npm install
-# Install Go Deps
-go mod tidy
+# Development
+To Start the server:
+```
+make dev
 ```
 
-**To start dev server run:**
+## Auto Browser Reload
+You can increase or decrease its latency (default 400ms).
 
-```sh
-make watch
+Makefile:
+```Makefile
+wgo -dir=node_modules npx livereload -w 400 public
 ```
 
-**To start prod server run:**
-
-```
-make
-```
+# Styling
+{{- if .UI.HasTailwind }}
+- With Tailwind no extra configuration is needed, start adding classes in any html file, it'll just work.
+{{- end }}
+- You can use plain CSS{{ if .UI.HasTailwind }} (even with Tailwind){{ end }}, again, it'll just work.
+{{- if .UI.HasTailwind }}
+- For CSS Modules please check this [guide](https://github.com/ttempaa/esbuild-plugin-tailwindcss#css-modules).
+{{- end }}
 
 # Deployment
+- You only need to run the compiled binary in the `bin` folder. All of your assets will be embedded into it as well.
+- Make sure to set `ENVIRONMENT=PRODUCTION` or just run `make` to start the production server.
 
-- You only need the built binary by Go and the bundled CSS & JS to run in production.
-- Environment Variables can be loaded via `.env` file or runtime (already configured).
-
-# How easy it is to use?
-
-```go
-func handleGetHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "Home", map[string]any{
-		"Title": "Go + Echo + HTMX",
-		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
-	})
-}
-```
-
-```html
-{{ define "Home" }}
-<h1 class="text-4xl">{{ index . "Ctx" "Title" }}</h1>
-<p class="mt-4">{{ index . "Ctx" "Desc" }}</p>
-{{ end }}
-```
-
-Only this much code is needed to render a page and dynamic content gets even more easier with Go Templates & HTMX combined with PrelineUI where components are by default interactive.
-
-# Quick Tips
-
-- **HTML Routes:** Render templates using handlers like the example above.
-- **JSON Routes:** Prefix API endpoints with `/api/json`. The configuration ensures JSON responses even on errors.
-
-For example, `/api/json/example` will always return a JSON response, whereas /`example` would render a template or custom HTML error pages.
-
-# Advanced Usage
-
-**You can also install any node library and use it.**
-
-1.  Install the library you want.
-2.  Update the esbuild configuration:
-
-    ```js
-    build({
-      // Add the main entrypoint
-      entryPoints: ["node_modules/some-library/index.js"],
-    });
-    ```
-
-3.  Include the bundled script in your templates:
-    your lib will be bundled and store in `public/bundle`, find the exact path and include in your templates.
-
-    ```html
-    <script src="/public/bundle/some-library/index.js"></script>
-    ```
-
-# Links to Documentation
-
+# Docs
+{{- if .Web.IsEcho }}
 - [Echo](https://echo.labstack.com)
-- [TailwindCSS](https://tailwindcss.com)
-- [Preline](https://preline.co)
-- [HTMX](https://htmx.org)
+{{- end }}
+{{- if .Web.IsFiber }}
+- [Fiber](https://docs.gofiber.io)
+{{- end }}
 - [Esbuild](https://esbuild.github.io)
+{{- if .UI.HasTailwind }}
+- [TailwindCSS](https://tailwindcss.com)
+{{- end }}
