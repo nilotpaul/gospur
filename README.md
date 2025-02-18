@@ -67,6 +67,5 @@ Read detailed usage and examples of every stack configured.
 # Coming Soon
 
 - More Framework Options.
-- Better templating with [templ](https://templ.guide) and [fiber](https://docs.gofiber.io) (django syntax).
 - More examples and documentation.
 - Please suggest More 🙏🏼
