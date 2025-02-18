@@ -52,6 +52,7 @@ Read detailed usage and examples of every stack configured.
 
 **Web Framework**
 - Echo  
+- Fiber
 
 **Styling**
 - Vanilla CSS  
