@@ -43,6 +43,7 @@ Read detailed usage and examples of every stack configured.
 
 **(Stacks)**
 - [Go + Echo + Templates](/docs/go-echo-templates.md)
+- [Go + Fiber + Templates](/docs/go-fiber-templates.md)
 
 **(Others)**
 - [Development Usage](/docs/development-usage.md)
@@ -51,6 +52,7 @@ Read detailed usage and examples of every stack configured.
 
 **Web Framework**
 - Echo  
+- Fiber
 
 **Styling**
 - Vanilla CSS  

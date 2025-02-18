@@ -1,8 +1,8 @@
 ---
-title: Go + Echo + Templates
+title: Go + Fiber + Templates
 ---
 
-# Go + Echo + Templates
+# Go + Fiber + Templates
 
 This is a minimal project template designed to be highly configurable for your requirements.
 
@@ -28,6 +28,8 @@ go mod tidy
 ```
 
 **To start dev server run:**
+
+The Fiber server takes a few milliseconds more than others to start up, during reload it might feel a little slower, in that case pls [reduce or remove the delay](/docs/development-usage.md#if-auto-browser-reload-feels-slow).
 
 ```sh
 make dev
@@ -59,29 +61,75 @@ ENVIRONMENT=PRODUCTION ./bin/build
 
 # How easy it is to use?
 
+> **Note: By default it'll use the default root layout**
+
+
+## Simple Example
 ```go
-func handleGetHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "Home", map[string]any{
+func handleGetHome(c *fiber.Ctx) error {
+	return c.Render("Home", map[string]any{
 		"Title": "GoSpur",
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }
 ```
-
 ```html
-{{ define "Home" }}
 <h1 class="text-4xl">{{ .Ctx.Title }}</h1>
 <p class="mt-4">{{ .Ctx.Desc }}</p>
-{{ end }}
+```
+Only this much code is needed to render a page.
+
+## With Custom Layout
+```go
+func handleGetHome(c *fiber.Ctx) error {
+	return c.Render("Other", map[string]any{
+		"Title": "Other Page",
+	}, "layouts/Layout.html")
+}
 ```
 
-Only this much code is needed to render a page.
+# Templates
+
+By default you'll get the stack with Go HTML Templates, but Fiber supports many templating engines like django.
+
+It's very easy to swap but in our case there're few extra steps.
+[See all supported engines](https://docs.gofiber.io/guide/templates#supported-engines).
+
+## Using Django
+
+Install and fix the import `github.com/gofiber/template/django/v3`
+> **Note: Keep track of the version it might change in future.**
+
+```go
+// (Only change the part shown)
+//
+// build_dev.go
+func LoadTemplates() *django.Engine {
+	return django.New("web", ".html")
+}
+// build_prod.go
+func LoadTemplates() *django.Engine {
+	subFS, err := fs.Sub(templateFS, "web")
+	if err != nil {
+		panic(err)
+	}
+
+	return html.NewFileSystem(http.FS(subFS), ".html")
+}
+// api/api.go
+type ServerConfig struct {
+	LoadTemplates func() *django.Engine
+}
+type TemplatesEngine struct {
+	engine *django.Engine
+}
+```
 
 # Styling
 
 - If you've selected tailwind, then no extra configuration is needed, start adding classes in any html file it'll just work.
 - You can always use plain css (even with tailwind), again it'll just work.
-- For CSS Modules please check go through this [guide](https://github.com/ttempaa/esbuild-plugin-tailwindcss?tab=readme-ov-file#css-modules).
+- For CSS Modules please go through this [guide](https://github.com/ttempaa/esbuild-plugin-tailwindcss?tab=readme-ov-file#css-modules).
 
 # Quick Tips
 
@@ -108,12 +156,12 @@ For example, `/api/json/example` will always return a JSON response, whereas `/e
     your lib will be bundled and store in `public/bundle`, find the exact path and include in your templates.
 
     ```html
-    <!-- Optionally defer if needed -> </script defer>...</script> -->
+    <!-- Optionally defer if needed eg. </script defer>...</script> -->
     <script src="/public/bundle/some-library.js"></script>
     ```
 
 # Links to Documentation
 
-- [Echo](https://echo.labstack.com)
+- [Fiber](https://docs.gofiber.io)
 - [Esbuild](https://esbuild.github.io)
 - [TailwindCSS](https://tailwindcss.com)
