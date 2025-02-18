@@ -10,17 +10,18 @@ import (
 const (
 	basicHomeBodyExampleHTML = `
 <body class="container">
-    <h1>{{ .Ctx.Title }}</h1>
-    <img
-      src="public/golang.jpg"
-      class="rounded-md"
-      height="500"
-      width="500"
-    />
-    <p>{{ .Ctx.Desc }}</p>
+    <div>
+      <h1>{{ .Ctx.Title }}</h1>
+      <img
+        src="public/golang.jpg"
+        class="rounded-md"
+        height="500"
+        width="500"
+      />
+      <p>{{ .Ctx.Desc }}</p>
+    </div>
 </body>`
 	tailwindHomeBodyExampleHTML = `
-<!-- Container (MAX-WIDTH -> 48rem) -->
 <body class="max-w-3xl mx-auto">
     <div class="flex items-center gap-y-6 mt-4 flex-col justify-center">
       <h1 class="text-4xl my-4 text-blue-600 font-bold">
@@ -97,7 +98,7 @@ func processRootLayoutPageData(cfg StackConfig) string {
 func processRawHomePageData(cfg StackConfig) string {
 	if cfg.WebFramework == "Fiber" {
 		return fmt.Sprintf(`{{ define "Home" }}%s{{ end }}`,
-			removeLinesStartEnd(generateHomeHTMLBody(cfg), 3, 1))
+			removeLinesStartEnd(generateHomeHTMLBody(cfg), 2, 1))
 	}
 
 	homeHTML := fmt.Sprintf(`{{ define "Home" }}
