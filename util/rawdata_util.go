@@ -83,8 +83,10 @@ func processRootLayoutPageData(cfg StackConfig) string {
     {{ end }}
     %s
 
-    <body class="%s">{{ embed }}</body>
+	<title>{{ .Ctx.Title }}</title>
+	<meta name="title" content="{{ .Ctx.Title }}">
   </head>
+  <body class="%s">{{ embed }}</body>
 </html>
 `,
 		generateHeadStyles(cfg),
@@ -115,6 +117,7 @@ func processRawHomePageData(cfg StackConfig) string {
     %s
 
     <title>{{ .Ctx.Title }}</title>
+	<meta name="title" content="{{ .Ctx.Title }}">
   </head>
   %s
 </html>
@@ -146,7 +149,8 @@ func processRawErrorPageData(cfg StackConfig) string {
     <script src="http://localhost:35729/livereload.js"></script>
     {{ end }}
 
-    <title>{{ .Ctx.Msg }}</title>
+    <title>{{ .Ctx.Title }}</title>
+	<meta name="title" content="{{ .Ctx.Title }}">
   </head>
   %s
 </html>
