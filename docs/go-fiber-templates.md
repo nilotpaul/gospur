@@ -51,18 +51,17 @@ You only need:
 
 - Commands to build for production:
 ```sh
-build cmd:
+# build cmd:
 node ./esbuild.config.js
 go build -tags '!dev' -o bin/build
 
-run cmd: 
+# run cmd: 
 ENVIRONMENT=PRODUCTION ./bin/build
 ```
 
 # How easy it is to use?
 
 > **Note: By default it'll use the default root layout**
-
 
 ## Simple Example
 ```go

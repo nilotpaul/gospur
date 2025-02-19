@@ -4,7 +4,6 @@
 
 A modern CLI Tool to bootstrap scalable web applications without hassling with JavaScript. It provides pre-configured developer tooling with no bloat, flexible for easy one step deployments.
 
-
 # What's better?
 
 - Only the necessary pre-configuration (full-control).
@@ -69,5 +68,6 @@ Read detailed usage and examples of every stack configured.
 # Coming Soon
 
 - More Framework Options.
+- Different Rendering Strategies (seperate client, [templ](https://templ.guide)).
 - More examples and documentation.
 - Please suggest More 🙏🏼
