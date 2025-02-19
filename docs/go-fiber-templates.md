@@ -63,7 +63,6 @@ ENVIRONMENT=PRODUCTION ./bin/build
 
 > **Note: By default it'll use the default root layout**
 
-
 ## Simple Example
 ```go
 func handleGetHome(c *fiber.Ctx) error {
