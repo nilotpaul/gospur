@@ -35,6 +35,9 @@ wgo -dir=node_modules npx livereload -w 400 public
 {{- if .Web.IsFiber }}
 - [Fiber](https://docs.gofiber.io)
 {{- end }}
+{{- if .Web.IsChi }}
+- [Chi](https://go-chi.io)
+{{- end }}
 - [Esbuild](https://esbuild.github.io)
 {{- if .UI.HasTailwind }}
 - [TailwindCSS](https://tailwindcss.com)
