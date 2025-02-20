@@ -89,4 +89,79 @@ func LoadTemplates() *html.Engine {
 
 	return html.NewFileSystem(http.FS(subFS), ".html")
 }
+{{- else if .Web.IsChi -}}
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"html/template"
+	"io/fs"
+	"log"
+	"net/http"
+	"path/filepath"
+	"strings"
+
+	"github.com/go-chi/chi/v5"
+)
+
+//go:embed public/*
+var publicFS embed.FS
+
+//go:embed web/*
+var templateFS embed.FS
+
+func ServeStatic(mux *chi.Mux) {
+	fs := http.FileServer(http.FS(publicFS))
+	mux.Get("/public/*", fs.ServeHTTP)
+}
+
+// parseTemplates takes a embed.FS where html files will reside.
+// It'll check nested dirs and load all files with .html ext.
+func parseTemplates(funcs ...template.FuncMap) (*template.Template, error) {
+	var (
+		tmpl = template.New("")
+		root = "."
+	)
+
+	// Registering functions
+	funcsMap := template.FuncMap{}
+	if len(funcs) > 0 {
+		for name, function := range funcs[0] {
+			funcsMap[name] = function
+		}
+	}
+
+	// embed func will help embedding templates from a template.
+	funcsMap["embed"] = func(name string, data any) template.HTML {
+		var out strings.Builder
+		if err := tmpl.ExecuteTemplate(&out, name, data); err != nil {
+			log.Println(err)
+		}
+
+		return template.HTML(out.String())
+	}
+
+	tmpl.Funcs(funcsMap)
+	err := fs.WalkDir(templateFS, root, func(path string, d fs.DirEntry, err error) error {
+		if err == nil {
+			if !d.IsDir() && filepath.Ext(path) == ".html" {
+				_, err := tmpl.ParseFS(templateFS, path)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return err
+	})
+
+	return tmpl, err
+}
+
+func LoadTemplates(funcs ...template.FuncMap) *template.Template {
+	return template.Must(parseTemplates(funcs...))
+}
 {{- end -}}

@@ -64,7 +64,15 @@ func generatePageContent(page string, cfg StackConfig) []byte {
 }
 
 func processRootLayoutPageData(cfg StackConfig) string {
-	var bodyClass string
+	var (
+		bodyClass string
+		embedFn   string
+	)
+	if cfg.WebFramework == "Fiber" {
+		embedFn = "embed"
+	} else if cfg.WebFramework == "Chi" {
+		embedFn = "embed .Page ."
+	}
 	if cfg.CssStrategy == "Tailwind" {
 		bodyClass = "flex items-center justify-center"
 	} else {
@@ -86,25 +94,24 @@ func processRootLayoutPageData(cfg StackConfig) string {
 	<title>{{ .Ctx.Title }}</title>
 	<meta name="title" content="{{ .Ctx.Title }}">
   </head>
-  <body class="%s">{{ embed }}</body>
+  <body class="%s">{{ %s }}</body>
 </html>
 `,
 		generateHeadStyles(cfg),
 		generateHeadScripts(cfg),
 		bodyClass,
+		embedFn,
 	)
 
 	return rootHTML
 }
 
 func processRawHomePageData(cfg StackConfig) string {
-	if cfg.WebFramework == "Fiber" {
-		return fmt.Sprintf(`{{ define "Home" }}%s{{ end }}`,
-			removeLinesStartEnd(generateHomeHTMLBody(cfg), 2, 1))
+	if cfg.WebFramework == "Fiber" || cfg.WebFramework == "Chi" {
+		return removeLinesStartEnd(generateHomeHTMLBody(cfg), 2, 1)
 	}
 
-	homeHTML := fmt.Sprintf(`{{ define "Home" }}
-<!DOCTYPE html>
+	homeHTML := fmt.Sprintf(`<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -120,9 +127,7 @@ func processRawHomePageData(cfg StackConfig) string {
 	<meta name="title" content="{{ .Ctx.Title }}">
   </head>
   %s
-</html>
-{{ end }}
-`,
+</html>`,
 		generateHeadStyles(cfg),
 		generateHeadScripts(cfg),
 		generateHomeHTMLBody(cfg),
@@ -132,13 +137,11 @@ func processRawHomePageData(cfg StackConfig) string {
 }
 
 func processRawErrorPageData(cfg StackConfig) string {
-	if cfg.WebFramework == "Fiber" {
-		return fmt.Sprintf(`{{ define "Error" }}%s{{ end }}`,
-			removeLinesStartEnd(generateErrorHTMLBody(cfg), 2, 1))
+	if cfg.WebFramework == "Fiber" || cfg.WebFramework == "Chi" {
+		return removeLinesStartEnd(generateErrorHTMLBody(cfg), 2, 1)
 	}
 
-	errorHTML := fmt.Sprintf(`{{ define "Error" }}
-<!DOCTYPE html>
+	errorHTML := fmt.Sprintf(`<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -153,9 +156,7 @@ func processRawErrorPageData(cfg StackConfig) string {
 	<meta name="title" content="{{ .Ctx.Title }}">
   </head>
   %s
-</html>
-{{ end }}
-`,
+</html>`,
 		generateHeadStyles(cfg),
 		generateErrorHTMLBody(cfg),
 	)

@@ -61,6 +61,7 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 		"Web": map[string]bool{
 			"IsEcho":  cfg.WebFramework == "Echo",
 			"IsFiber": cfg.WebFramework == "Fiber",
+			"IsChi":   cfg.WebFramework == "Chi",
 		},
 		"UI": map[string]bool{
 			// CSS Strategy

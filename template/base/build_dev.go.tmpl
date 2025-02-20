@@ -8,7 +8,6 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -27,7 +26,7 @@ func parseTemplates() (*template.Template, error) {
 
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err == nil {
-			if strings.Contains(path, ".html") {
+			if !info.IsDir() && filepath.Ext(path) == ".html" {
 				_, err = tmpl.ParseFiles(path)
 				if err != nil {
 					return err
@@ -66,5 +65,78 @@ func ServeStatic(app *fiber.App) fiber.Router {
 
 func LoadTemplates() *html.Engine {
 	return html.New("web", ".html")
+}
+{{- else if .Web.IsChi -}}
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"html/template"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/go-chi/chi/v5"
+)
+
+func ServeStatic(mux *chi.Mux) {
+	fs := http.FileServer(http.Dir("public"))
+	mux.Get("/public/*", http.StripPrefix("/public", fs).ServeHTTP)
+}
+
+// parseTemplates takes a directory where html files will reside.
+// It'll check nested dirs and load all files with .html ext.
+func parseTemplates(funcs ...template.FuncMap) (*template.Template, error) {
+	var (
+		tmpl = template.New("")
+		dir  = "web"
+	)
+
+	// Registering functions
+	funcsMap := template.FuncMap{}
+	if len(funcs) > 0 {
+		for name, function := range funcs[0] {
+			funcsMap[name] = function
+		}
+	}
+
+	// embed func will help embedding templates from a template.
+	funcsMap["embed"] = func(name string, data any) template.HTML {
+		var out strings.Builder
+		if err := tmpl.ExecuteTemplate(&out, name, data); err != nil {
+			log.Println(err)
+		}
+
+		return template.HTML(out.String())
+	}
+
+	tmpl.Funcs(funcsMap)
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err == nil {
+			if !info.IsDir() && filepath.Ext(path) == ".html" {
+				_, err = tmpl.ParseFiles(path)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		return err
+	})
+
+	return tmpl, err
+}
+
+func LoadTemplates(funcs ...template.FuncMap) *template.Template {
+	tmpls, err := parseTemplates(funcs...)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return tmpls
 }
 {{- end -}}

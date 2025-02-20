@@ -1,0 +1,12 @@
+package api
+
+import (
+	"net/http"
+)
+
+func handleGetHome(w http.ResponseWriter, r *http.Request) {
+	templates.Render(w, http.StatusOK, "Home.html", map[string]any{
+		"Title": "GoSpur Stack",
+		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
+	}, "Root.html")
+}
