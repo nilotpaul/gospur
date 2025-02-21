@@ -47,12 +47,14 @@ Read detailed usage and examples of every stack configured.
 
 **(Others)**
 - [Development Usage](/docs/development-usage.md)
+- [Recommendations](/docs/recommendations/index.md)
 
 # Configuration Options
 
 **Web Framework**
 - Echo  
 - Fiber
+- Chi
 
 **Styling**
 - Vanilla CSS  

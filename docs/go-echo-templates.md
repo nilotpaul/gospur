@@ -1,7 +1,3 @@
----
-title: Go + Echo + Templates
----
-
 # Go + Echo + Templates
 
 This is a minimal project template designed to be highly configurable for your requirements.
@@ -49,11 +45,11 @@ You only need:
 
 - Commands to build for production:
 ```sh
-build cmd:
+# build cmd:
 node ./esbuild.config.js
 go build -tags '!dev' -o bin/build
 
-run cmd: 
+# run cmd: 
 ENVIRONMENT=PRODUCTION ./bin/build
 ```
 

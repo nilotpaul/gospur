@@ -1,7 +1,3 @@
----
-title: Go + Chi + Templates
----
-
 # Go + Chi + Templates
 
 This is a minimal project template designed to be highly configurable for your requirements.
@@ -64,12 +60,14 @@ ENVIRONMENT=PRODUCTION ./bin/build
 ## Simple Example
 ```go
 func handleGetHome(w http.ResponseWriter, r *http.Request) {
-	return templates.Render(w, http.StatusOK, "Home.html", map[string]any{
+	templates.Render(w, http.StatusOK, "Home.html", map[string]any{
 		"Title": "GoSpur",
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }
 ```
+> **Note: `Render` retuns an error, it's recommended to [handle the errors centrally](#).**
+
 ```html
 <h1 class="text-4xl">{{ .Ctx.Title }}</h1>
 <p class="mt-4">{{ .Ctx.Desc }}</p>
@@ -78,8 +76,8 @@ Only this much code is needed to render a page.
 
 ## With Custom Layout
 ```go
-func handleGetHome(w http.ResponseWriter, r *http.Request) error {
-	return templates.Render(w, http.StatusOK, "Home.html", map[string]any{
+func handleGetOther(w http.ResponseWriter, r *http.Request) {
+	templates.Render(w, http.StatusOK, "Other.html", map[string]any{
 		"Title": "Other Page",
 	}, "Layout.html")    
 }
@@ -91,11 +89,11 @@ You'd use Go HTML Templates to render a page.
 
 ## Layouts
 
-With Go Templates, its very difficult to make a shareable layout, but we solved the issue in an effective manner.
+With Go Templates, it's very difficult to make a shareable layout, but we solved the issue in an effective manner.
 
 ## Creating a Layout
 
-Make any html files in any directory inside `web`.
+Create any html file in anywhere inside `web`.
 
 ```html
 <!DOCTYPE html>
@@ -114,10 +112,10 @@ And use this as a layout like shown [above](#with-custom-layout).
 ## Security Concerns
 
 - The `embed` function injects the HTML of another template.
-- This totally happens in our backend server.
+- This happens entirely in our backend server.
 - In production, we bundle these templates in the binary, not relying on the filesystem.
 
-In conclusion, it's totally safe and inspired by [Fiber](https://docs.gofiber.io).  
+In conclusion, it's safe and inspired by [Fiber](https://docs.gofiber.io).  
 
 # Styling
 

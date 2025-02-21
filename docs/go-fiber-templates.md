@@ -1,7 +1,3 @@
----
-title: Go + Fiber + Templates
----
-
 # Go + Fiber + Templates
 
 This is a minimal project template designed to be highly configurable for your requirements.
