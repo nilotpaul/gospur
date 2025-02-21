@@ -55,6 +55,8 @@ ENVIRONMENT=PRODUCTION ./bin/build
 
 # How easy it is to use?
 
+> **Note: By default it'll use the default root layout**
+
 ## Simple Example
 ```go
 func handleGetHome(w http.ResponseWriter, r *http.Request) {
