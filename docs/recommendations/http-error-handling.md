@@ -67,4 +67,6 @@ func handlePostSomething(w http.ResponseWriter, r *http.Request) error {
 
 mux := http.NewServeMux()
 mux.Handle("/some-page", handler(handleGetSomePage))
+
+http.ListenAndServe(":3000", mux)
 ```

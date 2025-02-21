@@ -43,7 +43,7 @@ go -dir=node_modules npx livereload -w 400 public
 
 ## Environment Variables
 
-All the configurations will be done for you by GoSpur.
+All the configurations will be done for you.
 
 Load env vars either by:
 - Creating a `.env` file.

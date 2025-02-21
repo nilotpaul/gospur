@@ -64,7 +64,7 @@ func handleGetHome(w http.ResponseWriter, r *http.Request) {
 	})
 }
 ```
-> **Note: `Render` retuns an error, it's recommended to [handle the errors centrally](#).**
+> **Note: `Render` retuns an error, it's recommended to [handle the errors centrally](/docs/recommendations/http-error-handling.md).**
 
 ```html
 <h1 class="text-4xl">{{ .Ctx.Title }}</h1>
@@ -87,7 +87,7 @@ You'd use Go HTML Templates to render a page.
 
 ## Layouts
 
-With Go Templates, it's very difficult to make a shareable layout, but we solved the issue in an effective manner.
+With Go Templates, it's very difficult to make a shareable layout, but we've solved the issue for you.
 
 ## Creating a Layout
 
