@@ -40,3 +40,17 @@ Change the delay time (ms) of the command, default will be 400ms.
 ```sh
 go -dir=node_modules npx livereload -w 400 public
 ```
+
+## Environment Variables
+
+All the configurations will be done for you by GoSpur.
+
+Load env vars either by:
+- Creating a `.env` file.
+- Using runtime injected ones.
+
+Please visit your `config/env.go` to configure further.
+
+# Docs
+
+- [godotenv](https://github.com/joho/godotenv#godotenv--)
