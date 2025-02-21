@@ -61,7 +61,7 @@ func (t *Template) Render(w http.ResponseWriter, status int, name string, data a
 	if len(layouts) > 0 {
 		return tmpls.templates.ExecuteTemplate(w, layouts[0], dataMap)
 	}
-	return tmpls.templates.ExecuteTemplate(w, name, dataMap)
+	return tmpls.templates.ExecuteTemplate(w, "Root.html", dataMap)
 }
 
 // Start will run the API Server
