@@ -1,4 +1,4 @@
-# Go + Echo + Templates
+# Go + Chi + Templates
 
 This is a minimal project template designed to be highly configurable for your requirements.
 
@@ -55,29 +55,71 @@ ENVIRONMENT=PRODUCTION ./bin/build
 
 # How easy it is to use?
 
+## Simple Example
 ```go
-func handleGetHome(c echo.Context) error {
-	return c.Render(http.StatusOK, "Home", map[string]any{
+func handleGetHome(w http.ResponseWriter, r *http.Request) {
+	templates.Render(w, http.StatusOK, "Home.html", map[string]any{
 		"Title": "GoSpur",
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }
 ```
+> **Note: `Render` retuns an error, it's recommended to [handle the errors centrally](/docs/recommendations/http-error-handling.md).**
 
 ```html
-{{ define "Home" }}
 <h1 class="text-4xl">{{ .Ctx.Title }}</h1>
 <p class="mt-4">{{ .Ctx.Desc }}</p>
-{{ end }}
+```
+Only this much code is needed to render a page.
+
+## With Custom Layout
+```go
+func handleGetOther(w http.ResponseWriter, r *http.Request) {
+	templates.Render(w, http.StatusOK, "Other.html", map[string]any{
+		"Title": "Other Page",
+	}, "Layout.html")    
+}
 ```
 
-Only this much code is needed to render a page.
+# Templates
+
+You'd use Go HTML Templates to render a page. 
+
+## Layouts
+
+With Go Templates, it's very difficult to make a shareable layout, but we've solved the issue for you.
+
+## Creating a Layout
+
+Create any html file in anywhere inside `web`.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Ctx.Title }}</title>
+</head>
+<body>{{ embed .Page . }}</body>
+</html>
+```
+
+And use this as a layout like shown [above](#with-custom-layout).
+
+## Security Concerns
+
+- The `embed` function injects the HTML of another template.
+- This happens entirely in our backend server.
+- In production, we bundle these templates in the binary, not relying on the filesystem.
+
+In conclusion, it's safe and inspired by [Fiber](https://docs.gofiber.io).  
 
 # Styling
 
 - If you've selected tailwind, then no extra configuration is needed, start adding classes in any html file it'll just work.
 - You can always use plain css (even with tailwind), again it'll just work.
-- For CSS Modules please check go through this [guide](https://github.com/ttempaa/esbuild-plugin-tailwindcss?tab=readme-ov-file#css-modules).
+- For CSS Modules please go through this [guide](https://github.com/ttempaa/esbuild-plugin-tailwindcss?tab=readme-ov-file#css-modules).
 
 # Quick Tips
 
@@ -104,12 +146,12 @@ For example, `/api/json/example` will always return a JSON response, whereas `/e
     your lib will be bundled and store in `public/bundle`, find the exact path and include in your templates.
 
     ```html
-    <!-- Optionally defer if needed -> </script defer>...</script> -->
+    <!-- Optionally defer if needed eg. </script defer>...</script> -->
     <script src="/public/bundle/some-library.js"></script>
     ```
 
 # Links to Documentation
 
-- [Echo](https://echo.labstack.com)
+- [Chi](https://go-chi.io/#/README)
 - [Esbuild](https://esbuild.github.io)
 - [TailwindCSS](https://tailwindcss.com)

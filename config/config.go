@@ -22,6 +22,7 @@ var (
 	WebFrameworkOpts = []string{
 		"Echo",
 		"Fiber",
+		"Chi",
 	}
 	ExtraOpts = []string{
 		"HTMX",
@@ -65,8 +66,8 @@ var (
 	}
 
 	ProjectAPIFiles = map[string][]string{
-		"api/api.go":     {"api/api.go.echo.tmpl", "api/api.go.fiber.tmpl"},
-		"api/route.go":   {"api/route.go.echo.tmpl", "api/route.go.fiber.tmpl"},
-		"api/handler.go": {"api/handler.go.echo.tmpl", "api/handler.go.fiber.tmpl"},
+		"api/api.go":     {"api/api.go.echo.tmpl", "api/api.go.fiber.tmpl", "api/api.go.chi.tmpl"},
+		"api/route.go":   {"api/route.go.echo.tmpl", "api/route.go.fiber.tmpl", "api/route.go.chi.tmpl"},
+		"api/handler.go": {"api/handler.go.echo.tmpl", "api/handler.go.fiber.tmpl", "api/handler.go.chi.tmpl"},
 	}
 )

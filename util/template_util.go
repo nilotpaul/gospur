@@ -249,7 +249,7 @@ func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
 	parsedBaseFiles := make(config.ProjectFiles, 0)
 	for target, path := range config.ProjectPageFiles {
 		// Skip layouts dir if not supported.
-		if strings.HasPrefix(target, "web/layouts") && cfg.WebFramework != "Fiber" {
+		if strings.HasPrefix(target, "web/layouts") && (cfg.WebFramework != "Fiber" && cfg.WebFramework != "Chi") {
 			continue
 		}
 		parsedBaseFiles[target] = path

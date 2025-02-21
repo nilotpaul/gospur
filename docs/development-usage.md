@@ -1,8 +1,6 @@
----
-title: Development Usage
----
+# Development Usage
 
-# Commands
+## Commands
 
 ```Makefile
 start: 
@@ -31,14 +29,28 @@ These are the default development commands which will be pre-configured for you.
 
 **These are specific to Linux only.**
 
-## For Windows
+### For Windows
 
 Please use git bash instead of command prompt or powershell and use the same `Makefile` above.
 
-# If Auto Browser Reload Feels Slow
+### If Auto Browser Reload Feels Slow
 
 Change the delay time (ms) of the command, default will be 400ms.
 
 ```sh
 go -dir=node_modules npx livereload -w 400 public
 ```
+
+## Environment Variables
+
+All the configurations will be done for you.
+
+Load env vars either by:
+- Creating a `.env` file.
+- Using runtime injected ones.
+
+Please visit your `config/env.go` to configure further.
+
+# Docs
+
+- [godotenv](https://github.com/joho/godotenv#godotenv--)
