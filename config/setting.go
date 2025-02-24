@@ -18,6 +18,8 @@ const Logo string = `
                     |_|               
 `
 
+const BinaryName = "gospur"
+
 var LogoColoured string = promptui.Styler(promptui.FGCyan, promptui.FGBold)(Logo)
 
 // GoSpur CLI version info

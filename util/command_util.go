@@ -1,12 +1,18 @@
 package util
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
+	"github.com/inconshreveable/go-update"
 	"github.com/manifoldco/promptui"
 	"github.com/nilotpaul/gospur/config"
 )
@@ -34,6 +40,21 @@ type ProjectPath struct {
 
 	// Path is the relative path to the project directory.
 	Path string
+}
+
+type GitHubReleaseResponse struct {
+	Version string `json:"tag_name"`
+	Assets  []struct {
+		ID                 int64  `json:"id"`
+		Name               string `json:"name"`
+		Size               int64  `json:"size"`
+		BrowserDownloadURL string `json:"browser_download_url"`
+	} `json:"assets"`
+}
+
+type ReleaseInfo struct {
+	Release GitHubReleaseResponse
+	Err     error
 }
 
 // GetStackConfig will give a series of prompts
@@ -156,6 +177,109 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 	fullPath := filepath.Join(cwd, targetPath)
 
 	return &ProjectPath{FullPath: fullPath, Path: targetPath}, nil
+}
+
+func doCLIUpdate(url string, targetPath string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	binary, err := uncompress(resp.Body, url)
+	if err != nil {
+		return err
+	}
+
+	return update.Apply(binary, update.Options{
+		TargetPath: targetPath,
+		TargetMode: os.ModePerm,
+	})
+}
+
+func GetReleaseInfo(ctx context.Context, v ...string) (GitHubReleaseResponse, error) {
+	var (
+		data         GitHubReleaseResponse
+		givenVersion = "latest"
+		releaseUrl   = fmt.Sprintf(config.GitHubReleaseAPIURL+"/%s", givenVersion)
+	)
+	if len(v) > 0 && v[0] != "latest" {
+		releaseUrl = fmt.Sprintf(config.GitHubReleaseAPIURL+"/tags/%s", v[0])
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseUrl, nil)
+	if err != nil {
+		return data, err
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if res.StatusCode == http.StatusNotFound {
+		return data, fmt.Errorf("version not found")
+	}
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return data, fmt.Errorf("request took too long or canceled")
+		}
+
+		return data, err
+	}
+	defer res.Body.Close()
+
+	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
+func HandleUpdateCLI(url string, exePath string) error {
+	var (
+		errChan = make(chan error, 1)
+		s       = NewSpinner("updating...")
+	)
+
+	s.Start()
+	defer func() {
+		close(errChan)
+		s.Stop()
+		fmt.Printf("%s", "\n")
+	}()
+
+	go func() {
+		errChan <- doCLIUpdate(url, exePath)
+	}()
+
+	err := <-errChan
+	return err
+}
+
+func HandleGetReleaseCmd(ctx context.Context) ReleaseInfo {
+	var (
+		dataChan chan ReleaseInfo = make(chan ReleaseInfo, 1)
+		wg       sync.WaitGroup
+
+		s = NewSpinner("getting the latest version...")
+	)
+
+	wg.Add(1)
+	s.Start()
+
+	defer func() {
+		close(dataChan)
+		s.Stop()
+	}()
+
+	go func() {
+		defer wg.Done()
+		release, err := GetReleaseInfo(ctx, "latest")
+		dataChan <- ReleaseInfo{Release: release, Err: err}
+	}()
+
+	wg.Wait()
+
+	info := <-dataChan
+	return info
 }
 
 func PrintSuccessMsg(path string) {
