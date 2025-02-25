@@ -17,13 +17,13 @@ builds:
       - arm64
       - 386
     ldflags: |
-      - "-s -w"
+      -s -w
       -X github.com/nilotpaul/gospur/config.version={{.Version}}
       -X github.com/nilotpaul/gospur/config.commit={{.Commit}} 
       -X github.com/nilotpaul/gospur/config.date={{.Date}}
 
 archives:
-  - format: tar.gz
+  - formats: [ 'tar.gz' ]
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
@@ -35,4 +35,4 @@ archives:
     # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ 'zip' ]
