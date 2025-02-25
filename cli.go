@@ -26,7 +26,7 @@ var (
 	}
 
 	// Project Update CLI command
-	// On run -> gospur update $version.
+	// On run -> gospur update (latest).
 	updateCmd = &cobra.Command{
 		Use:   "update",
 		Short: "Updates the CLI to the latest version",

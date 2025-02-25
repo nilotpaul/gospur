@@ -7,7 +7,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-const Logo string = `
+const logo string = `
    _____       _____                  
   / ____|     / ____|                 
  | |  __  ___| (___  _ __  _   _ _ __ 
@@ -18,9 +18,12 @@ const Logo string = `
                     |_|               
 `
 
-const BinaryName = "gospur"
+const (
+	WinBinaryName   = "gospur.exe"
+	OtherBinaryName = "gospur" // for linux and darwin
+)
 
-var LogoColoured string = promptui.Styler(promptui.FGCyan, promptui.FGBold)(Logo)
+var LogoColoured string = promptui.Styler(promptui.FGCyan, promptui.FGBold)(logo)
 
 // GoSpur CLI version info
 var (

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/nilotpaul/gospur/config"
@@ -89,33 +90,32 @@ func handleUpdateCmd(cmd *cobra.Command, args []string) {
 	}
 
 	// Cancel fetch to github releases if took more than 2 seconds.
-	ctx, cancel := context.WithDeadline(cmd.Context(), time.Now().Add(time.Second*2))
+	ctx, cancel := context.WithDeadline(cmd.Context(), time.Now().Add(2*time.Second))
 	defer cancel()
 
 	// Fetiching latest release from github api
-	info := util.HandleGetReleaseCmd(ctx)
-
-	if info.Err != nil {
-		fmt.Println(config.ErrMsg(info.Err))
+	release, err := util.HandleGetRelease(ctx)
+	if err != nil {
+		fmt.Println(config.ErrMsg(err))
 		return
 	}
 
-	if currVersion == info.Release.Version {
+	if currVersion == release.Version {
 		fmt.Println(config.ErrMsg("Latest version is already installed"))
 		return
 	}
 
 	var binaries []string
-	for _, asset := range info.Release.Assets {
+	for _, asset := range release.Assets {
 		binaries = append(binaries, asset.BrowserDownloadURL)
 	}
 
 	// Finding the compatible binary from currently installed one.
-	targetBinaryUrl := util.FindMatchingBinary(binaries)
+	targetBinaryUrl := util.FindMatchingBinary(binaries, runtime.GOOS, runtime.GOARCH)
 	if err := util.HandleUpdateCLI(targetBinaryUrl, installedExePath); err != nil {
 		fmt.Printf("Update failed: %v\n", config.ErrMsg(err))
 		return
 	}
 
-	fmt.Printf("CLI has been updated to the latest version (%s)\n", config.SuccessMsg(info.Release.Version))
+	fmt.Printf("CLI has been updated to the latest version (%s)\n", config.SuccessMsg(release.Version))
 }

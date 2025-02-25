@@ -84,10 +84,10 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 	}
 }
 
-// FindMatchingBinary loops over assets (binary links) and returns one
+// AutoDetectBinaryURL loops over assets (binary links) and returns one
 // compatible with the current system.
-func FindMatchingBinary(names []string) string {
-	os, arch := mapRuntimeOSAndArch(runtime.GOOS, runtime.GOARCH)
+func FindMatchingBinary(names []string, os string, arch string) string {
+	os, arch = mapRuntimeOSAndArch(os, arch)
 	expected := fmt.Sprintf("gospur_%s_%s", os, arch)
 
 	for _, name := range names {
@@ -114,7 +114,7 @@ func uncompress(src io.Reader, url string) (io.Reader, error) {
 
 		for _, file := range z.File {
 			_, name := filepath.Split(file.Name)
-			if !file.FileInfo().IsDir() && name == config.BinaryName {
+			if !file.FileInfo().IsDir() && matchBinaryFile(name) {
 				return file.Open()
 			}
 		}
@@ -141,7 +141,7 @@ func unarchiveTarGZ(src io.Reader) (io.Reader, error) {
 			return nil, fmt.Errorf("failed to unarchive .tar.gz file: %v", err)
 		}
 		_, name := filepath.Split(h.Name)
-		if name == config.BinaryName {
+		if matchBinaryFile(name) {
 			return t, nil
 		}
 	}
@@ -173,7 +173,7 @@ func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 	return true, nil
 }
 
-// Map Go's OS to GoReleaser's naming convention
+// Map Go's OS to GoReleaser's naming convention.
 func mapRuntimeOSAndArch(os string, arch string) (mappedOS string, mappedArch string) {
 	switch os {
 	case "darwin":
@@ -198,6 +198,18 @@ func mapRuntimeOSAndArch(os string, arch string) (mappedOS string, mappedArch st
 	}
 
 	return mappedOS, mappedArch
+}
+
+// matchBinaryFile checks returns true if the binary name is correct.
+func matchBinaryFile(name string) bool {
+	switch name {
+	case config.WinBinaryName:
+		return true
+	case config.OtherBinaryName:
+		return true
+	default:
+		return false
+	}
 }
 
 // contains checks if a slice of string contains the given item.

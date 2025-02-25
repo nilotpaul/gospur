@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	"github.com/inconshreveable/go-update"
 	"github.com/manifoldco/promptui"
@@ -50,11 +49,6 @@ type GitHubReleaseResponse struct {
 		Size               int64  `json:"size"`
 		BrowserDownloadURL string `json:"browser_download_url"`
 	} `json:"assets"`
-}
-
-type ReleaseInfo struct {
-	Release GitHubReleaseResponse
-	Err     error
 }
 
 // GetStackConfig will give a series of prompts
@@ -179,25 +173,7 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 	return &ProjectPath{FullPath: fullPath, Path: targetPath}, nil
 }
 
-func doCLIUpdate(url string, targetPath string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	binary, err := uncompress(resp.Body, url)
-	if err != nil {
-		return err
-	}
-
-	return update.Apply(binary, update.Options{
-		TargetPath: targetPath,
-		TargetMode: os.ModePerm,
-	})
-}
-
-func GetReleaseInfo(ctx context.Context, v ...string) (GitHubReleaseResponse, error) {
+func FetchRelease(ctx context.Context, v ...string) (GitHubReleaseResponse, error) {
 	var (
 		data         GitHubReleaseResponse
 		givenVersion = "latest"
@@ -214,15 +190,15 @@ func GetReleaseInfo(ctx context.Context, v ...string) (GitHubReleaseResponse, er
 
 	client := &http.Client{}
 	res, err := client.Do(req)
-	if res.StatusCode == http.StatusNotFound {
-		return data, fmt.Errorf("version not found")
-	}
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			return data, fmt.Errorf("request took too long or canceled")
 		}
 
 		return data, err
+	}
+	if res.StatusCode == http.StatusNotFound {
+		return data, fmt.Errorf("version not found")
 	}
 	defer res.Body.Close()
 
@@ -233,6 +209,8 @@ func GetReleaseInfo(ctx context.Context, v ...string) (GitHubReleaseResponse, er
 	return data, nil
 }
 
+// HandleUpdateCLI updates the cli to a new version, handling the pending
+// states and clean up.
 func HandleUpdateCLI(url string, exePath string) error {
 	var (
 		errChan = make(chan error, 1)
@@ -247,39 +225,42 @@ func HandleUpdateCLI(url string, exePath string) error {
 	}()
 
 	go func() {
-		errChan <- doCLIUpdate(url, exePath)
+		errChan <- doUpdate(url, exePath)
 	}()
 
 	err := <-errChan
 	return err
 }
 
-func HandleGetReleaseCmd(ctx context.Context) ReleaseInfo {
+// HandleGetRelease handles gets the latest release, handles pending states and clean up.
+func HandleGetRelease(ctx context.Context) (GitHubReleaseResponse, error) {
 	var (
-		dataChan chan ReleaseInfo = make(chan ReleaseInfo, 1)
-		wg       sync.WaitGroup
+		releaseChan = make(chan GitHubReleaseResponse, 1)
+		errChan     = make(chan error, 1)
 
 		s = NewSpinner("getting the latest version...")
 	)
 
-	wg.Add(1)
 	s.Start()
-
 	defer func() {
-		close(dataChan)
+		close(releaseChan)
+		close(errChan)
 		s.Stop()
+		fmt.Printf("%s", "\n")
 	}()
 
 	go func() {
-		defer wg.Done()
-		release, err := GetReleaseInfo(ctx, "latest")
-		dataChan <- ReleaseInfo{Release: release, Err: err}
+		// Fetch the latest release from github.
+		release, err := FetchRelease(ctx, "latest")
+
+		releaseChan <- release
+		errChan <- err
 	}()
 
-	wg.Wait()
+	release := <-releaseChan
+	err := <-errChan
 
-	info := <-dataChan
-	return info
+	return release, err
 }
 
 func PrintSuccessMsg(path string) {
@@ -302,6 +283,24 @@ npm install
 `, path)))
 	}
 
+}
+
+func doUpdate(url string, targetPath string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	binary, err := uncompress(resp.Body, url)
+	if err != nil {
+		return err
+	}
+
+	return update.Apply(binary, update.Options{
+		TargetPath: targetPath,
+		TargetMode: os.ModePerm,
+	})
 }
 
 func validateGoModPath(path string) error {
