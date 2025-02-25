@@ -55,7 +55,7 @@ ENVIRONMENT=PRODUCTION ./bin/build
 
 # How easy it is to use?
 
-> **Note: By default it'll use the default root layout**
+> **Note: By default it'll use the root layout**
 
 ## Simple Example
 ```go

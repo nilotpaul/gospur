@@ -14,6 +14,7 @@ import (
 	"github.com/inconshreveable/go-update"
 	"github.com/manifoldco/promptui"
 	"github.com/nilotpaul/gospur/config"
+	"github.com/nilotpaul/gospur/ui"
 )
 
 // StackConfig represents a final stack configuration
@@ -106,7 +107,7 @@ func GetStackConfig() (*StackConfig, error) {
 	}
 
 	// Extra Add-Ons
-	extraOptsPrompt := MultiSelect{
+	extraOptsPrompt := ui.MultiSelect{
 		Label: "Choose one or many extra options",
 		Items: config.ExtraOpts,
 	}
@@ -214,7 +215,7 @@ func FetchRelease(ctx context.Context, v ...string) (GitHubReleaseResponse, erro
 func HandleUpdateCLI(url string, exePath string) error {
 	var (
 		errChan = make(chan error, 1)
-		s       = NewSpinner("updating...")
+		s       = ui.NewSpinner("updating...")
 	)
 
 	s.Start()
@@ -238,7 +239,7 @@ func HandleGetRelease(ctx context.Context) (GitHubReleaseResponse, error) {
 		releaseChan = make(chan GitHubReleaseResponse, 1)
 		errChan     = make(chan error, 1)
 
-		s = NewSpinner("getting the latest version...")
+		s = ui.NewSpinner("getting the latest version...")
 	)
 
 	s.Start()
