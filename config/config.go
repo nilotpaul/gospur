@@ -2,6 +2,12 @@ package config
 
 import "github.com/manifoldco/promptui"
 
+// Github
+const (
+	GitHubRepoURL       = "https://github.com/nilotpaul/gospur"
+	GitHubReleaseAPIURL = "https://api.github.com/repos/nilotpaul/gospur/releases"
+)
+
 // For adding styles to console output.
 var (
 	ErrMsg     = promptui.Styler(promptui.FGRed)

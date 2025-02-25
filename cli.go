@@ -25,6 +25,15 @@ var (
 		Run:   handleInitCmd,
 	}
 
+	// Project Update CLI command
+	// On run -> gospur update (latest).
+	updateCmd = &cobra.Command{
+		Use:   "update",
+		Short: "Updates the CLI to the latest version",
+		Args:  cobra.NoArgs,
+		Run:   handleUpdateCmd,
+	}
+
 	// Project version command
 	// On run -> gospur version.
 	versionCmd = &cobra.Command{
@@ -43,6 +52,7 @@ func Execute() error {
 func init() {
 	rootCmd.AddCommand(
 		initCmd,
+		updateCmd,
 		versionCmd,
 	)
 }

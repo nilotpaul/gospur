@@ -1,11 +1,18 @@
 package util
 
 import (
+	"archive/tar"
+	"archive/zip"
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/nilotpaul/gospur/config"
 )
 
 const maxNestingDepth = 3
@@ -77,6 +84,71 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 	}
 }
 
+// AutoDetectBinaryURL loops over assets (binary links) and returns one
+// compatible with the current system.
+func FindMatchingBinary(names []string, os string, arch string) string {
+	os, arch = mapRuntimeOSAndArch(os, arch)
+	expected := fmt.Sprintf("gospur_%s_%s", os, arch)
+
+	for _, name := range names {
+		if strings.Contains(name, expected) {
+			return name
+		}
+	}
+
+	return ""
+}
+
+func uncompress(src io.Reader, url string) (io.Reader, error) {
+	if strings.HasSuffix(url, ".zip") {
+		buf, err := io.ReadAll(src)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read the release .zip file: %v", err)
+		}
+
+		r := bytes.NewReader(buf)
+		z, err := zip.NewReader(r, r.Size())
+		if err != nil {
+			return nil, fmt.Errorf("failed to uncompress the .zip file: %v", err)
+		}
+
+		for _, file := range z.File {
+			_, name := filepath.Split(file.Name)
+			if !file.FileInfo().IsDir() && matchBinaryFile(name) {
+				return file.Open()
+			}
+		}
+	} else if strings.HasSuffix(url, ".tar.gz") {
+		gz, err := gzip.NewReader(src)
+		if err != nil {
+			return nil, fmt.Errorf("failed to uncompress the .tar.gz file: %v", err)
+		}
+
+		return unarchiveTarGZ(gz)
+	}
+
+	return nil, fmt.Errorf("given file is not .tar.gz or .zip format")
+}
+
+func unarchiveTarGZ(src io.Reader) (io.Reader, error) {
+	t := tar.NewReader(src)
+	for {
+		h, err := t.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to unarchive .tar.gz file: %v", err)
+		}
+		_, name := filepath.Split(h.Name)
+		if matchBinaryFile(name) {
+			return t, nil
+		}
+	}
+
+	return nil, fmt.Errorf("binary not found after uncompressing")
+}
+
 // doesTargetDirExistAndIsEmpty takes a `target` path, if it's
 // not a directory, not empty or doesn't exist then it'll return
 // false and an error, otherwise true and nil error.
@@ -99,6 +171,45 @@ func doesTargetDirExistAndIsEmpty(target string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// Map Go's OS to GoReleaser's naming convention.
+func mapRuntimeOSAndArch(os string, arch string) (mappedOS string, mappedArch string) {
+	switch os {
+	case "darwin":
+		mappedOS = "Darwin"
+	case "linux":
+		mappedOS = "Linux"
+	case "windows":
+		mappedOS = "Windows"
+	default:
+		mappedOS = os
+	}
+
+	switch arch {
+	case "amd64":
+		mappedArch = "x86_64"
+	case "386":
+		mappedArch = "i386"
+	case "arm64":
+		mappedArch = "arm64"
+	default:
+		mappedArch = arch
+	}
+
+	return mappedOS, mappedArch
+}
+
+// matchBinaryFile checks returns true if the binary name is correct.
+func matchBinaryFile(name string) bool {
+	switch name {
+	case config.WinBinaryName:
+		return true
+	case config.OtherBinaryName:
+		return true
+	default:
+		return false
+	}
 }
 
 // contains checks if a slice of string contains the given item.

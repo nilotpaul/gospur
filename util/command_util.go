@@ -1,12 +1,17 @@
 package util
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/inconshreveable/go-update"
 	"github.com/manifoldco/promptui"
 	"github.com/nilotpaul/gospur/config"
 )
@@ -34,6 +39,16 @@ type ProjectPath struct {
 
 	// Path is the relative path to the project directory.
 	Path string
+}
+
+type GitHubReleaseResponse struct {
+	Version string `json:"tag_name"`
+	Assets  []struct {
+		ID                 int64  `json:"id"`
+		Name               string `json:"name"`
+		Size               int64  `json:"size"`
+		BrowserDownloadURL string `json:"browser_download_url"`
+	} `json:"assets"`
 }
 
 // GetStackConfig will give a series of prompts
@@ -158,6 +173,96 @@ func GetProjectPath(args []string) (*ProjectPath, error) {
 	return &ProjectPath{FullPath: fullPath, Path: targetPath}, nil
 }
 
+func FetchRelease(ctx context.Context, v ...string) (GitHubReleaseResponse, error) {
+	var (
+		data         GitHubReleaseResponse
+		givenVersion = "latest"
+		releaseUrl   = fmt.Sprintf(config.GitHubReleaseAPIURL+"/%s", givenVersion)
+	)
+	if len(v) > 0 && v[0] != "latest" {
+		releaseUrl = fmt.Sprintf(config.GitHubReleaseAPIURL+"/tags/%s", v[0])
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releaseUrl, nil)
+	if err != nil {
+		return data, err
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return data, fmt.Errorf("request took too long or canceled")
+		}
+
+		return data, err
+	}
+	if res.StatusCode == http.StatusNotFound {
+		return data, fmt.Errorf("version not found")
+	}
+	defer res.Body.Close()
+
+	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+		return data, err
+	}
+
+	return data, nil
+}
+
+// HandleUpdateCLI updates the cli to a new version, handling the pending
+// states and clean up.
+func HandleUpdateCLI(url string, exePath string) error {
+	var (
+		errChan = make(chan error, 1)
+		s       = NewSpinner("updating...")
+	)
+
+	s.Start()
+	defer func() {
+		close(errChan)
+		s.Stop()
+		fmt.Printf("%s", "\n")
+	}()
+
+	go func() {
+		errChan <- doUpdate(url, exePath)
+	}()
+
+	err := <-errChan
+	return err
+}
+
+// HandleGetRelease handles gets the latest release, handles pending states and clean up.
+func HandleGetRelease(ctx context.Context) (GitHubReleaseResponse, error) {
+	var (
+		releaseChan = make(chan GitHubReleaseResponse, 1)
+		errChan     = make(chan error, 1)
+
+		s = NewSpinner("getting the latest version...")
+	)
+
+	s.Start()
+	defer func() {
+		close(releaseChan)
+		close(errChan)
+		s.Stop()
+		fmt.Printf("%s", "\n")
+	}()
+
+	go func() {
+		// Fetch the latest release from github.
+		release, err := FetchRelease(ctx, "latest")
+
+		releaseChan <- release
+		errChan <- err
+	}()
+
+	release := <-releaseChan
+	err := <-errChan
+
+	return release, err
+}
+
 func PrintSuccessMsg(path string) {
 	fmt.Println(config.SuccessMsg("\nProject Created! 🎉\n"))
 	fmt.Println(config.NormalMsg("Please Run:"))
@@ -178,6 +283,24 @@ npm install
 `, path)))
 	}
 
+}
+
+func doUpdate(url string, targetPath string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	binary, err := uncompress(resp.Body, url)
+	if err != nil {
+		return err
+	}
+
+	return update.Apply(binary, update.Options{
+		TargetPath: targetPath,
+		TargetMode: os.ModePerm,
+	})
 }
 
 func validateGoModPath(path string) error {
