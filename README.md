@@ -32,8 +32,21 @@ or download prebuilt binary
 
 # Usage
 
-```
+## Create a new project
+```sh
 gospur init [project-name]
+```
+## Update the CLI
+```sh
+gospur update
+``` 
+
+Check more options by:
+```sh
+# help for cli
+gospur --help
+# help for each command
+gospur init --help
 ```
 
 # Docs
