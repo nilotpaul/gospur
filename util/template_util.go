@@ -122,6 +122,31 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	return nil
 }
 
+func ValidateStackConfig(cfg StackConfig) error {
+	var errors []string
+
+	if !matchFrameworkOpt(cfg.WebFramework) {
+		errors = append(errors, "Invalid Web Framework")
+	}
+	if !matchStylingOpt(cfg.CssStrategy) {
+		errors = append(errors, "Invalid CSS Strategy")
+	}
+	if !matchUIOpt(cfg.UILibrary) {
+		errors = append(errors, "Invalid UI Library")
+	}
+
+	for _, opt := range cfg.ExtraOpts {
+		if !matchExtraOpt(opt) {
+			errors = append(errors, fmt.Sprintf("Invalid Extra: %s", opt))
+		}
+	}
+
+	if len(errors) > 0 {
+		return fmt.Errorf("\n%s", strings.Join(errors, "\n"))
+	}
+	return nil
+}
+
 // parseTemplate takes `fullWritePath`, template path and template embed.
 //
 // `fullWritePath` -> has to be joined with the project or targetPath. (eg. gospur/config/env.go)
@@ -274,4 +299,56 @@ func skipProjectfiles(filePath string, cfg StackConfig) bool {
 	}
 
 	return false
+}
+
+func matchFrameworkOpt(v string) bool {
+	switch v {
+	case "Echo":
+		return true
+	case "Chi":
+		return true
+	case "Fiber":
+		return true
+	default:
+		return false
+	}
+}
+
+func matchStylingOpt(v string) bool {
+	switch v {
+	case "Vanilla CSS":
+		return true
+	case "Tailwind":
+		return true
+	default:
+		return false
+	}
+}
+
+func matchUIOpt(v string) bool {
+	switch v {
+	case "Preline":
+		return true
+	case "DaisyUI":
+		return true
+	// Can be empty if not chosen or not compatible
+	case "":
+		return true
+	default:
+		return false
+	}
+}
+
+func matchExtraOpt(v string) bool {
+	switch v {
+	case "HTMX":
+		return true
+	case "Dockerfile":
+		return true
+	// Can be empty if not chosen
+	case "":
+		return true
+	default:
+		return false
+	}
 }

@@ -13,7 +13,7 @@ run: build
 	@$(BINARY)
 
 build: 
-	@CGO_ENABLED=0 go build -ldflags="-s -w" -o $(BINARY) .
+	@go build -o $(BINARY) .
 	@GOOS=windows GOARCH=amd64 go build -o $(BINARY).exe . 
 
 test:

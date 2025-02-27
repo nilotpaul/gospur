@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/nilotpaul/gospur/config"
+	"github.com/nilotpaul/gospur/util"
 	"github.com/spf13/cobra"
 )
 
@@ -50,6 +52,24 @@ func Execute() error {
 }
 
 func init() {
+	// Flags for init cmd.
+	initCmd.Flags().StringVar(
+		&stackConfig.WebFramework, "framework", "",
+		strings.Join(config.WebFrameworkOpts, ", "),
+	)
+	initCmd.Flags().StringVar(
+		&stackConfig.CssStrategy, "styling", "",
+		strings.Join(config.CssStrategyOpts, ", "),
+	)
+	initCmd.Flags().StringVar(
+		&stackConfig.UILibrary, "ui", "",
+		strings.Join(util.GetMapKeys(config.UILibraryOpts), ", "),
+	)
+	initCmd.Flags().StringSliceVar(
+		&stackConfig.ExtraOpts, "extra", []string{},
+		fmt.Sprintf("One or Many: %s", strings.Join(config.ExtraOpts, ", ")),
+	)
+
 	rootCmd.AddCommand(
 		initCmd,
 		updateCmd,
