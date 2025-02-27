@@ -27,8 +27,8 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}
-	cfg := *stackConfig
 
+	cfg := *stackConfig
 	// Validate the provided options.
 	if err := util.ValidateStackConfig(cfg); err != nil {
 		fmt.Println(config.ErrMsg(err))

@@ -28,6 +28,11 @@ type StackConfig struct {
 	// UI Library is pre-made styled libs like Preline.
 	UILibrary string
 
+	// RenderingStrategy defines how HTML is rendered.
+	// Eg. templates, templ, seperate client.
+	RenderingStrategy string
+
+	// Flags Only
 	// Extras are extra add-ons like css lib, HTMX etc.
 	ExtraOpts []string
 }
@@ -108,17 +113,17 @@ func GetStackConfig(cfg *StackConfig) error {
 			cfg.UILibrary = uiLib
 		}
 	}
-	// Extra Add-Ons
-	if len(cfg.ExtraOpts) == 0 {
-		extraOptsPrompt := ui.MultiSelect{
-			Label: "Choose one or many extra options",
-			Items: config.ExtraOpts,
+	// Rendering Strategy Options
+	if len(cfg.RenderingStrategy) == 0 {
+		renderingStratPrompt := promptui.Select{
+			Label: "Choose a Rendering Strategy",
+			Items: config.RenderingStrategy,
 		}
-		opts, err := extraOptsPrompt.Run()
+		_, opts, err := renderingStratPrompt.Run()
 		if err != nil {
-			return fmt.Errorf("failed to select extra options")
+			return fmt.Errorf("failed to select Rendering Strategy")
 		}
-		cfg.ExtraOpts = opts
+		cfg.RenderingStrategy = opts
 	}
 
 	return nil

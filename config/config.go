@@ -30,11 +30,6 @@ var (
 		"Fiber",
 		"Chi",
 	}
-	ExtraOpts = []string{
-		"HTMX",
-		"Dockerfile",
-	}
-
 	CssStrategyOpts = []string{
 		"Tailwind",
 		"Vanilla CSS",
@@ -42,6 +37,15 @@ var (
 	UILibraryOpts = map[string][]string{
 		"Preline": {"Tailwind"},
 		"DaisyUI": {"Tailwind"},
+	}
+	RenderingStrategy = []string{
+		"Templates",
+	}
+
+	// Flags Only
+	ExtraOpts = []string{
+		"HTMX",
+		"Dockerfile",
 	}
 )
 

@@ -65,6 +65,10 @@ func init() {
 		&stackConfig.UILibrary, "ui", "",
 		strings.Join(util.GetMapKeys(config.UILibraryOpts), ", "),
 	)
+	initCmd.Flags().StringVar(
+		&stackConfig.RenderingStrategy, "render", "",
+		strings.Join(config.RenderingStrategy, ", "),
+	)
 	initCmd.Flags().StringSliceVar(
 		&stackConfig.ExtraOpts, "extra", []string{},
 		fmt.Sprintf("One or Many: %s", strings.Join(config.ExtraOpts, ", ")),
