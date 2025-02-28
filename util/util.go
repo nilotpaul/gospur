@@ -99,6 +99,15 @@ func FindMatchingBinary(names []string, os string, arch string) string {
 	return ""
 }
 
+func GetMapKeys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0)
+	for k := range m {
+		keys = append(keys, k)
+	}
+
+	return keys
+}
+
 func uncompress(src io.Reader, url string) (io.Reader, error) {
 	if strings.HasSuffix(url, ".zip") {
 		buf, err := io.ReadAll(src)

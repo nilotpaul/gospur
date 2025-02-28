@@ -28,6 +28,11 @@ type StackConfig struct {
 	// UI Library is pre-made styled libs like Preline.
 	UILibrary string
 
+	// RenderingStrategy defines how HTML is rendered.
+	// Eg. templates, templ, seperate client.
+	RenderingStrategy string
+
+	// Flags Only
 	// Extras are extra add-ons like css lib, HTMX etc.
 	ExtraOpts []string
 }
@@ -54,70 +59,74 @@ type GitHubReleaseResponse struct {
 
 // GetStackConfig will give a series of prompts
 // to the user to configure their project stack.
-func GetStackConfig() (*StackConfig, error) {
-	var cfg StackConfig
-
+func GetStackConfig(cfg *StackConfig) error {
 	// Framework options
-	frameworkPrompt := promptui.Select{
-		Label: "Choose a web framework",
-		Items: config.WebFrameworkOpts,
-	}
-	_, framework, err := frameworkPrompt.Run()
-	if err != nil {
-		return nil, fmt.Errorf("failed to select web framework")
-	}
-	cfg.WebFramework = framework
-
-	// CSS Strategy
-	extraPrompt := promptui.Select{
-		Label: "Choose a CSS Strategy",
-		Items: config.CssStrategyOpts,
-	}
-	_, css, err := extraPrompt.Run()
-	if err != nil {
-		return nil, fmt.Errorf("failed to select CSS Strategy")
-	}
-	cfg.CssStrategy = css
-
-	// UI Library Options
-	// Filtering the opts for UI Libs based on the css strategy chosen.
-	filteredOpts := make([]string, 0)
-	for lib, deps := range config.UILibraryOpts {
-		if len(deps) == 0 {
-			filteredOpts = append(filteredOpts, lib)
-			continue
+	if len(cfg.WebFramework) == 0 {
+		frameworkPrompt := promptui.Select{
+			Label: "Choose a web framework",
+			Items: config.WebFrameworkOpts,
 		}
-		if contains(deps, cfg.CssStrategy) {
-			filteredOpts = append(filteredOpts, lib)
-		}
-	}
-	// Only ask anything if we have a compatible UI Lib for
-	// the chosen CSS Strategy.
-	if len(filteredOpts) != 0 {
-		// Asking for UI Lib if we've any filtered opts.
-		uiLibPrompt := promptui.Select{
-			Label: "Choose a UI Library",
-			Items: filteredOpts,
-		}
-		_, uiLib, err := uiLibPrompt.Run()
+		_, framework, err := frameworkPrompt.Run()
 		if err != nil {
-			return nil, fmt.Errorf("failed to select UI Library")
+			return fmt.Errorf("failed to select web framework")
 		}
-		cfg.UILibrary = uiLib
+		cfg.WebFramework = framework
+	}
+	// Rendering Strategy Options
+	if len(cfg.RenderingStrategy) == 0 {
+		renderingStratPrompt := promptui.Select{
+			Label: "Choose a Rendering Strategy",
+			Items: config.RenderingStrategy,
+		}
+		_, opts, err := renderingStratPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("failed to select Rendering Strategy")
+		}
+		cfg.RenderingStrategy = opts
+	}
+	// CSS Strategy
+	if len(cfg.CssStrategy) == 0 && cfg.RenderingStrategy == "Templates" {
+		extraPrompt := promptui.Select{
+			Label: "Choose a CSS Strategy",
+			Items: config.CssStrategyOpts,
+		}
+		_, css, err := extraPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("failed to select CSS Strategy")
+		}
+		cfg.CssStrategy = css
+	}
+	// UI Library Options
+	if len(cfg.UILibrary) == 0 && cfg.RenderingStrategy == "Templates" {
+		// Filtering the opts for UI Libs based on the css strategy chosen.
+		filteredOpts := make([]string, 0)
+		for lib, deps := range config.UILibraryOpts {
+			if len(deps) == 0 {
+				filteredOpts = append(filteredOpts, lib)
+				continue
+			}
+			if contains(deps, cfg.CssStrategy) {
+				filteredOpts = append(filteredOpts, lib)
+			}
+		}
+
+		// Only ask anything if we have a compatible UI Lib for
+		// the chosen CSS Strategy.
+		if len(filteredOpts) != 0 {
+			// Asking for UI Lib if we've any filtered opts.
+			uiLibPrompt := promptui.Select{
+				Label: "Choose a UI Library",
+				Items: filteredOpts,
+			}
+			_, uiLib, err := uiLibPrompt.Run()
+			if err != nil {
+				return fmt.Errorf("failed to select UI Library")
+			}
+			cfg.UILibrary = uiLib
+		}
 	}
 
-	// Extra Add-Ons
-	extraOptsPrompt := ui.MultiSelect{
-		Label: "Choose one or many extra options",
-		Items: config.ExtraOpts,
-	}
-	opts, err := extraOptsPrompt.Run()
-	if err != nil {
-		return nil, fmt.Errorf("failed to select extra options")
-	}
-	cfg.ExtraOpts = opts
-
-	return &cfg, nil
+	return nil
 }
 
 // GetGoModulePath will give a input prompt to the user

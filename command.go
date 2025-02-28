@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var stackConfig = &util.StackConfig{}
+
 // handleInitCmd handles the `init` command for gospur CLI.
 func handleInitCmd(cmd *cobra.Command, args []string) {
 	targetPath, err := util.GetProjectPath(args)
@@ -21,12 +23,17 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 	}
 
 	// Building the stack config by talking user prompts.
-	stackCfg, err := util.GetStackConfig()
-	if err != nil {
+	if err := util.GetStackConfig(stackConfig); err != nil {
 		fmt.Println(config.ErrMsg(err))
 		return
 	}
-	cfg := *stackCfg
+
+	cfg := *stackConfig
+	// Validate the provided options.
+	if err := util.ValidateStackConfig(cfg); err != nil {
+		fmt.Println(config.ErrMsg(err))
+		return
+	}
 
 	// Asking for the go mod path from user.
 	goModPath, err := util.GetGoModulePath()

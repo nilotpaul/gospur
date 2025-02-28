@@ -20,7 +20,7 @@ func TestSkipProjectfiles(t *testing.T) {
 	a.False(skip)
 
 	// With Vanilla CSS, tailwind.config.js is not needed.
-	mockStackCfg.CssStrategy = "Vanilla CSS"
+	mockStackCfg.CssStrategy = "Vanilla"
 	skip = skipProjectfiles("tailwind.config.js", mockStackCfg)
 	a.True(skip)
 }

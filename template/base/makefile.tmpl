@@ -1,27 +1,6 @@
 {{- if .IsLinux -}}
-start: 
-	@node ./esbuild.config.js
-	@go build -tags '!dev' -o bin/build
-	@ENVIRONMENT=PRODUCTION ./bin/build
-
-build:
-	@node ./esbuild.config.js
-	@go build -tags 'dev' -o bin/build
-
-dev:
-	@wgo \
-    -exit \
-    -file=.go \
-    -file=.html \
-	-file=.css \
-	-xdir=public \
-	go build -tags 'dev' -o bin/build . \
-    :: ENVIRONMENT=DEVELOPMENT ./bin/build \
-    :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
-	:: wgo -dir=node_modules npx livereload -w 400 public
-{{- else -}}
 # As you're not using linux, please vist https://github.com/nilotpaul/gospur/blob/main/docs/development-usage.md
-
+{{- end -}}
 start: 
 	@node ./esbuild.config.js
 	@go build -tags '!dev' -o bin/build
@@ -41,5 +20,4 @@ dev:
 	go build -tags 'dev' -o bin/build . \
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
     :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
-	:: wgo -dir=node_modules npx livereload -w 400 public
-{{- end -}}
+	:: wgo -dir=node_modules npx livereload -w 800 web

@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if err := Execute(); err != nil {
-		fmt.Println(config.ErrMsg("Go Spur exited"))
+		fmt.Println(config.ErrMsg("GoSpur exited"))
 		os.Exit(1)
 	}
 }
