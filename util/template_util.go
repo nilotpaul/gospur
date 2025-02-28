@@ -316,7 +316,7 @@ func matchFrameworkOpt(v string) bool {
 
 func matchStylingOpt(v string) bool {
 	switch v {
-	case "Vanilla CSS":
+	case "Vanilla":
 		return true
 	case "Tailwind":
 		return true

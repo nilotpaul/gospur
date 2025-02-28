@@ -70,7 +70,7 @@ Read detailed usage and examples of every stack configured.
 - Chi
 
 **Styling**
-- Vanilla CSS  
+- Vanilla  
 - Tailwind
 
 **UI Library** 

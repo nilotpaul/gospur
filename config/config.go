@@ -32,7 +32,7 @@ var (
 	}
 	CssStrategyOpts = []string{
 		"Tailwind",
-		"Vanilla CSS",
+		"Vanilla",
 	}
 	UILibraryOpts = map[string][]string{
 		"Preline": {"Tailwind"},

@@ -72,8 +72,20 @@ func GetStackConfig(cfg *StackConfig) error {
 		}
 		cfg.WebFramework = framework
 	}
+	// Rendering Strategy Options
+	if len(cfg.RenderingStrategy) == 0 {
+		renderingStratPrompt := promptui.Select{
+			Label: "Choose a Rendering Strategy",
+			Items: config.RenderingStrategy,
+		}
+		_, opts, err := renderingStratPrompt.Run()
+		if err != nil {
+			return fmt.Errorf("failed to select Rendering Strategy")
+		}
+		cfg.RenderingStrategy = opts
+	}
 	// CSS Strategy
-	if len(cfg.CssStrategy) == 0 {
+	if len(cfg.CssStrategy) == 0 && cfg.RenderingStrategy == "Templates" {
 		extraPrompt := promptui.Select{
 			Label: "Choose a CSS Strategy",
 			Items: config.CssStrategyOpts,
@@ -85,7 +97,7 @@ func GetStackConfig(cfg *StackConfig) error {
 		cfg.CssStrategy = css
 	}
 	// UI Library Options
-	if len(cfg.UILibrary) == 0 {
+	if len(cfg.UILibrary) == 0 && cfg.RenderingStrategy == "Templates" {
 		// Filtering the opts for UI Libs based on the css strategy chosen.
 		filteredOpts := make([]string, 0)
 		for lib, deps := range config.UILibraryOpts {
@@ -112,18 +124,6 @@ func GetStackConfig(cfg *StackConfig) error {
 			}
 			cfg.UILibrary = uiLib
 		}
-	}
-	// Rendering Strategy Options
-	if len(cfg.RenderingStrategy) == 0 {
-		renderingStratPrompt := promptui.Select{
-			Label: "Choose a Rendering Strategy",
-			Items: config.RenderingStrategy,
-		}
-		_, opts, err := renderingStratPrompt.Run()
-		if err != nil {
-			return fmt.Errorf("failed to select Rendering Strategy")
-		}
-		cfg.RenderingStrategy = opts
 	}
 
 	return nil
