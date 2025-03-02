@@ -76,13 +76,15 @@ func GetStackConfig(cfg *StackConfig) error {
 	if len(cfg.RenderingStrategy) == 0 {
 		renderingStratPrompt := promptui.Select{
 			Label: "Choose a Rendering Strategy",
-			Items: config.RenderingStrategy,
+			Items: GetRenderingOpts(false),
 		}
-		_, opts, err := renderingStratPrompt.Run()
+		_, opt, err := renderingStratPrompt.Run()
 		if err != nil {
 			return fmt.Errorf("failed to select Rendering Strategy")
 		}
-		cfg.RenderingStrategy = opts
+		if v, ok := config.RenderingStrategy[opt]; ok {
+			cfg.RenderingStrategy = v
+		}
 	}
 	// CSS Strategy
 	if len(cfg.CssStrategy) == 0 && cfg.RenderingStrategy == "Templates" {
@@ -273,7 +275,7 @@ func HandleGetRelease(ctx context.Context) (GitHubReleaseResponse, error) {
 	return release, err
 }
 
-func PrintSuccessMsg(path string) {
+func PrintSuccessMsg(path string, cfg StackConfig) {
 	fmt.Println(config.SuccessMsg("\nProject Created! 🎉\n"))
 	fmt.Println(config.NormalMsg("Please Run:"))
 
@@ -284,6 +286,12 @@ go install github.com/bokwoon95/wgo@latest
 go mod tidy
 npm install
 `))
+	} else if cfg.RenderingStrategy == "Seperate" {
+		fmt.Println(config.FaintMsg(fmt.Sprintf(`
+cd %s
+go install github.com/bokwoon95/wgo@latest
+go mod tidy
+`, path)))
 	} else {
 		fmt.Println(config.FaintMsg(fmt.Sprintf(`
 cd %s

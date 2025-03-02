@@ -78,6 +78,10 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 			"HasPreline": cfg.UILibrary == "Preline",
 			"HasDaisy":   cfg.UILibrary == "DaisyUI",
 		},
+		"Render": map[string]bool{
+			"IsTemplates": cfg.RenderingStrategy == "Templates",
+			"IsSeperate":  cfg.RenderingStrategy == "Seperate",
+		},
 		"Extras": map[string]bool{
 			"HasHTMX": contains(cfg.ExtraOpts, "HTMX"),
 		},
@@ -97,6 +101,19 @@ func FindMatchingBinary(names []string, os string, arch string) string {
 	}
 
 	return ""
+}
+
+func GetRenderingOpts(actual bool) []string {
+	opts := make([]string, 0)
+	for name, actualName := range config.RenderingStrategy {
+		if actual {
+			opts = append(opts, actualName)
+		} else {
+			opts = append(opts, name)
+		}
+	}
+
+	return opts
 }
 
 func GetMapKeys[K comparable, V any](m map[K]V) []K {

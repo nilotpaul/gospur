@@ -114,9 +114,11 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		}
 	}
 
-	// Create an example public asset
-	if err := createExamplePublicAsset(targetDir); err != nil {
-		return fmt.Errorf("failed to create the public directory %v", err)
+	// Create an example public asset if rendering is not seperate.
+	if cfg.RenderingStrategy != "Seperate" {
+		if err := createExamplePublicAsset(targetDir); err != nil {
+			return fmt.Errorf("failed to create the public directory %v", err)
+		}
 	}
 
 	return nil
@@ -127,6 +129,9 @@ func ValidateStackConfig(cfg StackConfig) error {
 
 	if !matchFrameworkOpt(cfg.WebFramework) {
 		errors = append(errors, "Invalid Web Framework")
+	}
+	if !matchRenderOpt(cfg.RenderingStrategy) {
+		errors = append(errors, "Invalid Rendering Strategy")
 	}
 	if !matchStylingOpt(cfg.CssStrategy) {
 		errors = append(errors, "Invalid CSS Strategy")
@@ -272,7 +277,11 @@ func preprocessBaseFiles(cfg StackConfig) config.ProjectFiles {
 // strip, exclude any unnecessary files or configuration based on the `StackConfig`.
 func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
 	parsedBaseFiles := make(config.ProjectFiles, 0)
+	// Skip everything except instruction.md if seperate client is chosen.
 	for target, path := range config.ProjectPageFiles {
+		if cfg.RenderingStrategy == "Seperate" && !strings.HasSuffix(target, "instruction.md") {
+			continue
+		}
 		// Skip layouts dir if not supported.
 		if strings.HasPrefix(target, "web/layouts") && (cfg.WebFramework != "Fiber" && cfg.WebFramework != "Chi") {
 			continue
@@ -289,6 +298,9 @@ func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
 //
 // Info: Should be only valid for Base Files.
 func skipProjectfiles(filePath string, cfg StackConfig) bool {
+	if cfg.RenderingStrategy == "Seperate" && isFrontendFile(filePath) {
+		return true
+	}
 	// Skip tailwind config if tailwind is not selected as a CSS Strategy.
 	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind" {
 		return true
@@ -314,11 +326,24 @@ func matchFrameworkOpt(v string) bool {
 	}
 }
 
+func matchRenderOpt(v string) bool {
+	switch v {
+	case "Templates":
+		return true
+	case "Seperate":
+		return true
+	default:
+		return false
+	}
+}
+
 func matchStylingOpt(v string) bool {
 	switch v {
 	case "Vanilla":
 		return true
 	case "Tailwind":
+		return true
+	case "":
 		return true
 	default:
 		return false
@@ -351,4 +376,12 @@ func matchExtraOpt(v string) bool {
 	default:
 		return false
 	}
+}
+
+func isFrontendFile(s string) bool {
+	return strings.HasSuffix(s, ".js") ||
+		strings.HasSuffix(s, ".json") ||
+		strings.HasSuffix(s, ".css") ||
+		strings.HasPrefix(s, "web/styles") ||
+		strings.HasPrefix(s, "public")
 }

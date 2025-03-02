@@ -57,7 +57,8 @@ func generatePageContent(page string, cfg StackConfig) []byte {
 		result = processRawErrorPageData(cfg)
 	case "Root.html":
 		result = processRootLayoutPageData(cfg)
-	default:
+	case "instruction.md":
+		result = generateInstruction()
 	}
 
 	return []byte(gohtml.Format(result))
@@ -201,4 +202,17 @@ func generateHeadStyles(StackConfig) string {
 	}
 
 	return strings.Join(styles, "\n")
+}
+
+func generateInstruction() string {
+	return `
+# Instructions
+After building your frontend, copy the static files in this directory.
+Make sure you do not copy the entire folder (build, dist, etc.), only bring the files from it.
+
+-> web/dist/...files
+
+For more info visit -> 
+**You can delete this file later.**
+`
 }

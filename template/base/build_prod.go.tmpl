@@ -1,4 +1,4 @@
-{{- if .Web.IsEcho -}}
+{{- if and .Web.IsEcho .Render.IsTemplates -}}
 //go:build !dev
 // +build !dev
 
@@ -51,7 +51,7 @@ func parseTemplates() (*template.Template, error) {
 func LoadTemplates(*echo.Echo) *template.Template {
 	return template.Must(parseTemplates())
 }
-{{- else if .Web.IsFiber -}}
+{{- else if and .Web.IsFiber .Render.IsTemplates -}}
 //go:build !dev
 // +build !dev
 
@@ -89,7 +89,7 @@ func LoadTemplates() *html.Engine {
 
 	return html.NewFileSystem(http.FS(subFS), ".html")
 }
-{{- else if .Web.IsChi -}}
+{{- else if and .Web.IsChi .Render.IsTemplates -}}
 //go:build !dev
 // +build !dev
 
@@ -163,5 +163,31 @@ func parseTemplates(funcs ...template.FuncMap) (*template.Template, error) {
 
 func LoadTemplates(funcs ...template.FuncMap) *template.Template {
 	return template.Must(parseTemplates(funcs...))
+}
+{{- end -}}
+{{- if and .Web.IsEcho .Render.IsSeperate -}}
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+//go:embed web/dist/*
+var web embed.FS
+
+func ServeStatic(e *echo.Echo) {
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:       "web/dist",
+		Index:      "index.html",
+		HTML5:      true,
+		Filesystem: http.FS(web),
+	}))
 }
 {{- end -}}

@@ -38,7 +38,9 @@ wgo -dir=node_modules npx livereload -w 400 public
 {{- if .Web.IsChi }}
 - [Chi](https://go-chi.io)
 {{- end }}
+{{- if not .Render.IsSeperate }}
 - [Esbuild](https://esbuild.github.io)
+{{- end }}
 {{- if .UI.HasTailwind }}
 - [TailwindCSS](https://tailwindcss.com)
 {{- end }}

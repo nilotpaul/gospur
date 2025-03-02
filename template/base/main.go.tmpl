@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package main
 
 import (
@@ -19,3 +20,25 @@ func main() {
 
 	log.Fatal(server.Start())
 }
+{{- else if .Render.IsSeperate -}}
+package main
+
+import (
+	"log"
+
+	"{{ .ModPath }}/api"
+	"{{ .ModPath }}/config"
+)
+
+func main() {
+	// Loading the env vars from either a `.env` file or runtime.
+	env := config.MustloadEnv()
+
+	// API Server
+	server := api.NewAPIServer(*env, api.ServerConfig{
+		ServeStatic:   ServeStatic,
+	})
+
+	log.Fatal(server.Start())
+}
+{{- end -}}

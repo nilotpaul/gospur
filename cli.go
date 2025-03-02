@@ -67,7 +67,7 @@ func init() {
 	)
 	initCmd.Flags().StringVar(
 		&stackConfig.RenderingStrategy, "render", "",
-		strings.Join(config.RenderingStrategy, ", "),
+		strings.Join(util.GetRenderingOpts(true), ", "),
 	)
 	initCmd.Flags().StringSliceVar(
 		&stackConfig.ExtraOpts, "extra", []string{},

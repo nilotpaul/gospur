@@ -1,6 +1,7 @@
-{{- if .IsLinux -}}
+{{- if not .IsLinux -}}
 # As you're not using linux, please vist https://github.com/nilotpaul/gospur/blob/main/docs/development-usage.md
 {{- end -}}
+{{- if .Render.IsTemplates -}}
 start: 
 	@node ./esbuild.config.js
 	@go build -tags '!dev' -o bin/build
@@ -21,3 +22,19 @@ dev:
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
     :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
 	:: wgo -dir=node_modules npx livereload -w 800 web
+{{- else -}}
+start: 
+	@go build -tags '!dev' -o bin/build
+	@ENVIRONMENT=PRODUCTION ./bin/build
+
+build:
+	@go build -tags 'dev' -o bin/build
+
+dev:
+	@wgo \
+    -exit \
+    -file=.go \
+	-xdir=public \
+	go build -tags 'dev' -o bin/build . \
+    :: ENVIRONMENT=DEVELOPMENT ./bin/build
+{{ end }}
