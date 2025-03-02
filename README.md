@@ -64,22 +64,7 @@ Read detailed usage and examples of every stack configured.
 
 # Configuration Options
 
-**Web Framework**
-- Echo  
-- Fiber
-- Chi
-
-**Styling**
-- Vanilla  
-- Tailwind
-
-**UI Library** 
-- Preline  
-- DaisyUI
-
-**Extra Options**
-- HTMX  
-- Dockerfile
+The configuration options include settings from various web frameworks to different rendering modes. For a detailed list, please check the [Configuration Options Docs](/docs/configuration.md).
 
 # Coming Soon
 
