@@ -104,13 +104,16 @@ func FindMatchingBinary(names []string, os string, arch string) string {
 }
 
 func GetRenderingOpts(actual bool) []string {
-	opts := make([]string, 0)
+	opts := make([]string, len(config.RenderingStrategy))
+	idx := 0
+
 	for name, actualName := range config.RenderingStrategy {
 		if actual {
-			opts = append(opts, actualName)
+			opts[idx] = actualName
 		} else {
-			opts = append(opts, name)
+			opts[idx] = name
 		}
+		idx++
 	}
 
 	return opts
