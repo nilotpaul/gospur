@@ -190,4 +190,77 @@ func ServeStatic(e *echo.Echo) {
 		Filesystem: http.FS(web),
 	}))
 }
+{{- else if and .Web.IsFiber .Render.IsSeperate -}}
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"io/fs"
+	"log"
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+)
+
+//go:embed web/dist/*
+var web embed.FS
+
+func ServeStatic(app *fiber.App) {
+	subFS, err := fs.Sub(web, "web/dist")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	app.Use(filesystem.New(filesystem.Config{
+		Root:         http.FS(subFS),
+		Browse:       false,
+		Index:        "index.html",
+		NotFoundFile: "index.html",
+	}))
+}
+{{- else if and .Web.IsChi .Render.IsSeperate -}}
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"io/fs"
+	"log"
+	"net/http"
+	"strings"
+
+	"github.com/go-chi/chi/v5"
+)
+
+//go:embed web/dist/*
+var web embed.FS
+
+func ServeStatic(mux *chi.Mux) {
+	subFS, err := fs.Sub(web, "web/dist")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fs := http.FileServer(http.FS(subFS))
+
+	mux.Handle("/*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+
+		// Check if the requested file exists
+		_, err := subFS.Open(path)
+		if err != nil {
+			// If not found, serve index.html (for client-side routing)
+			http.ServeFileFS(w, r, subFS, "index.html")
+			return
+		}
+
+		fs.ServeHTTP(w, r)
+	}))
+}
 {{- end -}}

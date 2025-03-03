@@ -277,9 +277,13 @@ func preprocessBaseFiles(cfg StackConfig) config.ProjectFiles {
 // strip, exclude any unnecessary files or configuration based on the `StackConfig`.
 func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
 	parsedBaseFiles := make(config.ProjectFiles, 0)
-	// Skip everything except instruction.md if seperate client is chosen.
 	for target, path := range config.ProjectPageFiles {
+		// Skip everything except instruction.md if seperate client is chosen.
 		if cfg.RenderingStrategy == "Seperate" && !strings.HasSuffix(target, "instruction.md") {
+			continue
+		}
+		// Skip instruction.md if seperate client is not chosen.
+		if cfg.RenderingStrategy != "Seperate" && strings.HasSuffix(target, "instruction.md") {
 			continue
 		}
 		// Skip layouts dir if not supported.

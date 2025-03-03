@@ -21,7 +21,7 @@ dev:
 	go build -tags 'dev' -o bin/build . \
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
     :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
-	:: wgo -dir=node_modules npx livereload -w 800 web
+	:: wgo -dir=node_modules npx livereload -w 800 -ee go .
 {{- else -}}
 start: 
 	@go build -tags '!dev' -o bin/build

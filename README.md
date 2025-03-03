@@ -57,6 +57,7 @@ Read detailed usage and examples of every stack configured.
 - [Go + Echo + Templates](/docs/go-echo-templates.md)
 - [Go + Fiber + Templates](/docs/go-fiber-templates.md)
 - [Go + Chi + Templates](/docs/go-chi-templates.md)
+- [Go + Seperate Client](/docs/go-seperate-client.md)
 
 **(Others)**
 - [Development Usage](/docs/development-usage.md)

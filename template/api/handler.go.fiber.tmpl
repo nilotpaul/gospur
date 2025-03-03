@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package api
 
 import (
@@ -33,3 +34,30 @@ func handleGetHome(c *fiber.Ctx) error {
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }
+{{- else if .Render.IsSeperate -}}
+package api
+
+import (
+	"github.com/gofiber/fiber/v2"
+)
+
+func HTTPErrorHandler(c *fiber.Ctx, err error) error {
+	var (
+		status  int    = 500
+		msg     string = "Internal Server Error"
+		fullErr string = "Something Went Wrong"
+	)
+	if he, ok := err.(*fiber.Error); ok {
+		status = he.Code
+		msg = he.Message
+		fullErr = he.Error()
+	}
+
+	return c.Status(status).JSON(map[string]any{"status": status, "message": msg, "error": fullErr})
+
+}
+
+func handleGetHealth(c *fiber.Ctx) error {
+	return c.SendString("OK")
+}
+{{- end -}}

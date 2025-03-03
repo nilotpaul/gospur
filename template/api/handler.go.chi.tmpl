@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package api
 
 import (
@@ -10,3 +11,15 @@ func handleGetHome(w http.ResponseWriter, r *http.Request) {
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	}, "Root.html")
 }
+{{- else if .Render.IsSeperate -}}
+package api
+
+import (
+	"net/http"
+)
+
+func handleGetHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+{{- end -}}
