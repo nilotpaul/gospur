@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package api
 
 import (
@@ -38,3 +39,32 @@ func handleGetHome(c echo.Context) error {
 		"Desc":  "Best for building Full-Stack Applications with minimal JavaScript",
 	})
 }
+{{- else if .Render.IsSeperate -}}
+package api
+
+import (
+	"net/http"
+	"regexp"
+
+	"github.com/labstack/echo/v4"
+)
+
+func HTTPErrorHandler(err error, c echo.Context) {
+	var (
+		status  int    = 500
+		msg     string = "Internal Server Error"
+		fullErr string = "Something Went Wrong"
+	)
+	if he, ok := err.(*echo.HTTPError); ok {
+		status = he.Code
+		msg = regexp.MustCompile(`message=([^,]+)`).FindStringSubmatch(he.Error())[1]
+		fullErr = he.Error()
+	}
+
+	c.JSON(status, map[string]any{"status": status, "message": msg, "error": fullErr})
+}
+
+func handleGetHealth(c echo.Context) error {
+	return c.String(http.StatusOK, "OK")
+}
+{{- end -}}

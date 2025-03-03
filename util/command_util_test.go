@@ -99,7 +99,7 @@ func TestValidateGoModPath(t *testing.T) {
 // GenerateRandomString generates a random string of a given length
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	rand.Seed(time.Now().UnixNano())
+	rand.NewSource(time.Now().UnixNano())
 
 	result := make([]byte, length)
 	for i := range result {

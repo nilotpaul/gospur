@@ -57,6 +57,7 @@ Read detailed usage and examples of every stack configured.
 - [Go + Echo + Templates](/docs/go-echo-templates.md)
 - [Go + Fiber + Templates](/docs/go-fiber-templates.md)
 - [Go + Chi + Templates](/docs/go-chi-templates.md)
+- [Go + Seperate Client](/docs/go-seperate-client.md)
 
 **(Others)**
 - [Development Usage](/docs/development-usage.md)
@@ -64,26 +65,11 @@ Read detailed usage and examples of every stack configured.
 
 # Configuration Options
 
-**Web Framework**
-- Echo  
-- Fiber
-- Chi
-
-**Styling**
-- Vanilla  
-- Tailwind
-
-**UI Library** 
-- Preline  
-- DaisyUI
-
-**Extra Options**
-- HTMX  
-- Dockerfile
+The configuration options include settings from various web frameworks to different rendering modes. For a detailed list, please check the [Configuration Options Docs](/docs/configuration.md).
 
 # Coming Soon
 
 - More Framework Options.
-- Different Rendering Strategies (seperate client, [templ](https://templ.guide)).
+- Different Rendering Strategies (~~seperate client~~, [templ](https://templ.guide)).
 - More examples and documentation.
 - Please suggest More 🙏🏼

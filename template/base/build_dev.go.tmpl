@@ -1,4 +1,4 @@
-{{- if .Web.IsEcho -}}
+{{- if and .Web.IsEcho .Render.IsTemplates -}}
 //go:build dev
 // +build dev
 
@@ -48,7 +48,7 @@ func LoadTemplates(e *echo.Echo) *template.Template {
 
 	return tmpls
 }
-{{- else if .Web.IsFiber -}}
+{{- else if and .Web.IsFiber .Render.IsTemplates -}}
 //go:build dev
 // +build dev
 
@@ -66,7 +66,7 @@ func ServeStatic(app *fiber.App) fiber.Router {
 func LoadTemplates() *html.Engine {
 	return html.New("web", ".html")
 }
-{{- else if .Web.IsChi -}}
+{{- else if and .Web.IsChi .Render.IsTemplates -}}
 //go:build dev
 // +build dev
 
@@ -139,4 +139,38 @@ func LoadTemplates(funcs ...template.FuncMap) *template.Template {
 
 	return tmpls
 }
+{{- end -}}
+{{- if and .Web.IsEcho .Render.IsSeperate -}}
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"github.com/labstack/echo/v4"
+)
+
+func ServeStatic(*echo.Echo) {}
+{{ else if and .Web.IsFiber .Render.IsSeperate }}
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"github.com/gofiber/fiber/v2"
+)
+
+func ServeStatic(*fiber.App) {}
+{{- else if and .Web.IsChi .Render.IsSeperate -}}
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"github.com/go-chi/chi/v5"
+)
+
+func ServeStatic(*chi.Mux) {}
 {{- end -}}

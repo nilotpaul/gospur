@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package api
 
 import (
@@ -19,3 +20,26 @@ func NewRouter(env config.EnvConfig) *Routes {
 func (r *Routes) RegisterRoutes(router fiber.Router) {
 	router.Add("GET", "/", handleGetHome)
 }
+{{- else if .Render.IsSeperate -}}
+package api
+
+import (
+	"{{ .ModPath }}/config"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type Routes struct {
+	env config.EnvConfig
+}
+
+func NewRouter(env config.EnvConfig) *Routes {
+	return &Routes{
+		env: env,
+	}
+}
+
+func (r *Routes) RegisterRoutes(router fiber.Router) {
+	router.Add("GET", "/health", handleGetHealth)
+}
+{{- end -}}

@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package api
 
 import (
@@ -82,3 +83,63 @@ func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
 
 	api.ServeStatic(e)
 }
+{{- else if .Render.IsSeperate -}}
+package api
+
+import (
+	"log"
+
+	"{{ .ModPath }}/config"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+type ServerConfig struct {
+	// Serving static assets from `web` folder.
+	ServeStatic func(*echo.Echo)
+}
+
+type APIServer struct {
+	listenAddr string
+	env        config.EnvConfig
+	ServerConfig
+}
+
+func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+	return &APIServer{
+		listenAddr:   ":" + env.PORT,
+		env:          env,
+		ServerConfig: cfg,
+	}
+}
+
+// Start will run the API Server
+// Any global middlewares like Logger should be registered here.
+func (api *APIServer) Start() error {
+	e := echo.New()
+
+	// Global Middlewares
+	api.registerGlobalMiddlewares(e)
+
+	// Routes
+	r := NewRouter(api.env)
+	r.RegisterRoutes(e.Router())
+
+	log.Printf("Visit http://localhost%s", api.listenAddr)
+
+	return e.Start(api.listenAddr)
+}
+
+// Extend the list of global middlewares as needed.
+func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
+	e.Use(middleware.Recover())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "-> '${uri}' - ${method} (${status})\n",
+	}))
+
+	e.HTTPErrorHandler = HTTPErrorHandler
+
+	api.ServeStatic(e)
+}
+{{- end -}}

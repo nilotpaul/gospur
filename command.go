@@ -67,7 +67,7 @@ func handleInitCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	util.PrintSuccessMsg(targetPath.Path)
+	util.PrintSuccessMsg(targetPath.Path, cfg)
 }
 
 // handleVersionCmd handles the `version` command for gospur CLI.

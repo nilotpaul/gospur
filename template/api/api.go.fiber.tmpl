@@ -1,3 +1,4 @@
+{{- if .Render.IsTemplates -}}
 package api
 
 import (
@@ -84,3 +85,62 @@ func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
 
 	api.ServeStatic(app)
 }
+{{- else if .Render.IsSeperate -}}
+package api
+
+import (
+	"log"
+
+	"{{ .ModPath }}/config"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+)
+
+type ServerConfig struct {
+	// Serving static assets from `web` folder.
+	ServeStatic func(*fiber.App)
+}
+
+type APIServer struct {
+	listenAddr string
+	env        config.EnvConfig
+	ServerConfig
+}
+
+func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+	return &APIServer{
+		listenAddr:   ":" + env.PORT,
+		env:          env,
+		ServerConfig: cfg,
+	}
+}
+
+// Start will run the API Server
+// Any global middlewares like Logger should be registered here.
+func (api *APIServer) Start() error {
+	app := fiber.New(fiber.Config{
+		ErrorHandler: HTTPErrorHandler,
+	})
+
+	// Global Middlewares
+	api.registerGlobalMiddlewares(app)
+
+	// Routes
+	r := NewRouter(api.env)
+	r.RegisterRoutes(app)
+
+	log.Printf("Visit http://localhost%s", api.listenAddr)
+
+	return app.Listen(api.listenAddr)
+}
+
+// Extend the list of global middlewares as needed.
+func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
+	app.Use(recover.New())
+	app.Use(logger.New())
+
+	api.ServeStatic(app)
+}
+{{- end -}}
