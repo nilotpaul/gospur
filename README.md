@@ -70,6 +70,6 @@ The configuration options include settings from various web frameworks to differ
 # Coming Soon
 
 - More Framework Options.
-- Different Rendering Strategies (seperate client, [templ](https://templ.guide)).
+- Different Rendering Strategies (~~seperate client~~, [templ](https://templ.guide)).
 - More examples and documentation.
 - Please suggest More 🙏🏼
