@@ -38,7 +38,7 @@ Please use git bash instead of command prompt or powershell and use the same `Ma
 Change the delay time (ms) of the command, default will be 400ms.
 
 ```sh
-go -dir=node_modules npx livereload -w 400 public
+go -dir=node_modules npx livereload -w 800 -ee go .
 ```
 
 ## Environment Variables
