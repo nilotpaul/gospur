@@ -183,9 +183,14 @@ import (
 var web embed.FS
 
 func ServeStatic(e *echo.Echo) {
+	const (
+		root     = "web/dist"
+		index    = "index.html"
+	)
+
 	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:       "web/dist",
-		Index:      "index.html",
+		Root:       root,
+		Index:      index,
 		HTML5:      true,
 		Filesystem: http.FS(web),
 	}))
@@ -210,7 +215,13 @@ import (
 var web embed.FS
 
 func ServeStatic(app *fiber.App) {
-	subFS, err := fs.Sub(web, "web/dist")
+	const (
+		root     = "web/dist"
+		index    = "index.html"
+		fallback = "index.html"
+	)
+
+	subFS, err := fs.Sub(web, root)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -218,8 +229,8 @@ func ServeStatic(app *fiber.App) {
 	app.Use(filesystem.New(filesystem.Config{
 		Root:         http.FS(subFS),
 		Browse:       false,
-		Index:        "index.html",
-		NotFoundFile: "index.html",
+		Index:        index,
+		NotFoundFile: fallback,
 	}))
 }
 {{- else if and .Web.IsChi .Render.IsSeperate -}}
@@ -242,7 +253,13 @@ import (
 var web embed.FS
 
 func ServeStatic(mux *chi.Mux) {
-	subFS, err := fs.Sub(web, "web/dist")
+	const (
+		root     = "web/dist"
+		index    = "index.html"
+		fallback = "index.html"
+	)
+
+	subFS, err := fs.Sub(web, root)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -252,11 +269,15 @@ func ServeStatic(mux *chi.Mux) {
 	mux.Handle("/*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/")
 
+		if len(path) == 0 {
+			path = index
+		}
+
 		// Check if the requested file exists
 		_, err := subFS.Open(path)
 		if err != nil {
 			// If not found, serve index.html (for client-side routing)
-			http.ServeFileFS(w, r, subFS, "index.html")
+			http.ServeFileFS(w, r, subFS, fallback)
 			return
 		}
 
