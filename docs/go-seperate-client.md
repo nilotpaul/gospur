@@ -42,12 +42,13 @@ Some SSG frameworks may generate a `404.html` for handling missing pages. To ser
 
 **Echo Example**
 ```go
-// Todo: will fix this later. Echo doesn't have an option to specify a fallback.
 e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
-	Root:         "web/dist",
-	Index:        "index.html",
+	Root:         root,
+	Index:        index,
 	Filesystem:   http.FS(web),
 }))
+// Add this line
+e.FileFS("/*", "404.html", echo.MustSubFS(web, root))
 ```
 
 **Fiber Example**
@@ -63,16 +64,19 @@ app.Use(filesystem.New(filesystem.Config{
 **Chi Example**
 ```go
 mux.Handle("/*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimPrefix(r.URL.Path, "/")
+		path := strings.TrimPrefix(r.URL.Path, "/")
 
-	// Check if the requested file exists
-	_, err := subFS.Open(path)
-	if err != nil {
-		// If not found, serve fallback page.
-		http.ServeFileFS(w, r, subFS, "404.html") // Change this
-		return
-	}
+		if len(path) == 0 {
+			path = "index.html"
+		}
+		// Check if the requested file exists
+		_, err := subFS.Open(path)
+		if err != nil {
+			// If not found, serve fallback page.
+			http.ServeFileFS(w, r, subFS, "404.html") // Change this
+			return
+		}
 
-    fs.ServeHTTP(w, r)
-}))
+		fs.ServeHTTP(w, r)
+	}))
 ```
