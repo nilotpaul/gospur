@@ -122,9 +122,8 @@ type TemplatesEngine struct {
 
 # Styling
 
-- If you've selected tailwind, then no extra configuration is needed, start adding classes in any html file it'll just work.
-- You can always use plain css (even with tailwind), again it'll just work.
-- For CSS Modules please go through this [guide](https://github.com/ttempaa/esbuild-plugin-tailwindcss?tab=readme-ov-file#css-modules).
+- If you've selected tailwind, then no extra configuration is needed, start adding classes in any html.
+- You can always use plain css (even with tailwind).
 
 # Quick Tips
 
