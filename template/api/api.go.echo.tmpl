@@ -49,6 +49,9 @@ func (api *APIServer) Start() error {
 	r := NewRouter(api.env)
 	r.RegisterRoutes(e.Router())
 
+	// Static routes
+	api.ServeStatic(e)
+
 	log.Printf("Visit http://localhost%s", api.listenAddr)
 
 	return e.Start(api.listenAddr)
@@ -80,8 +83,6 @@ func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
 
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.Renderer = &Template{templates: api.LoadTemplates(e), env: api.env}
-
-	api.ServeStatic(e)
 }
 {{- else if .Render.IsSeperate -}}
 package api
@@ -126,6 +127,9 @@ func (api *APIServer) Start() error {
 	r := NewRouter(api.env)
 	r.RegisterRoutes(e.Router())
 
+	// Static routes
+	api.ServeStatic(e)
+
 	log.Printf("Visit http://localhost%s", api.listenAddr)
 
 	return e.Start(api.listenAddr)
@@ -139,7 +143,5 @@ func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
 	}))
 
 	e.HTTPErrorHandler = HTTPErrorHandler
-
-	api.ServeStatic(e)
 }
 {{- end -}}
