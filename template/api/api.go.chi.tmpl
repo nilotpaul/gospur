@@ -78,6 +78,9 @@ func (api *APIServer) Start() error {
 	r := NewRouter(api.env)
 	r.RegisterRoutes(mux)
 
+	// Static routes
+	api.ServeStatic(mux)
+
 	log.Printf("Visit http://localhost%s", api.listenAddr)
 
 	return http.ListenAndServe(api.listenAddr, mux)
@@ -100,8 +103,6 @@ func logger(h http.Handler) http.Handler {
 func (api *APIServer) registerGlobalMiddlewares(mux *chi.Mux) {
 	mux.Use(logger) // Logger should come before Recoverer
 	mux.Use(middleware.Recoverer)
-
-	api.ServeStatic(mux)
 }
 {{- else if .Render.IsSeperate -}}
 package api
@@ -146,6 +147,9 @@ func (api *APIServer) Start() error {
 	// Routes
 	r := NewRouter(api.env)
 	r.RegisterRoutes(mux)
+	
+	// Static routes
+	api.ServeStatic(mux)
 
 	log.Printf("Visit http://localhost%s", api.listenAddr)
 
@@ -156,7 +160,5 @@ func (api *APIServer) Start() error {
 func (api *APIServer) registerGlobalMiddlewares(mux *chi.Mux) {
 	mux.Use(middleware.Logger) // Logger should come before Recoverer
 	mux.Use(middleware.Recoverer)
-
-	api.ServeStatic(mux)
 }
 {{- end -}}

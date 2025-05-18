@@ -68,6 +68,9 @@ func (api *APIServer) Start() error {
 	r := NewRouter(api.env)
 	r.RegisterRoutes(app)
 
+	// Static routes
+	api.ServeStatic(app)
+
 	log.Printf("Visit http://localhost%s", api.listenAddr)
 
 	return app.Listen(api.listenAddr)
@@ -82,8 +85,6 @@ func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
 			return strings.HasPrefix(c.Path(), "/public")
 		},
 	}))
-
-	api.ServeStatic(app)
 }
 {{- else if .Render.IsSeperate -}}
 package api
@@ -131,6 +132,9 @@ func (api *APIServer) Start() error {
 	r := NewRouter(api.env)
 	r.RegisterRoutes(app)
 
+	// Static routes
+	api.ServeStatic(app)
+
 	log.Printf("Visit http://localhost%s", api.listenAddr)
 
 	return app.Listen(api.listenAddr)
@@ -140,7 +144,5 @@ func (api *APIServer) Start() error {
 func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
 	app.Use(recover.New())
 	app.Use(logger.New())
-
-	api.ServeStatic(app)
 }
 {{- end -}}
