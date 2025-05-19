@@ -51,3 +51,8 @@ func GetVersion() (string, error) {
 
 	return "", noInfoErr
 }
+
+func GetSafeVersion() string {
+	version, _ := GetVersion()
+	return NormalMsg(version)
+}
