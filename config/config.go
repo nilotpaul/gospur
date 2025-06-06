@@ -31,7 +31,8 @@ var (
 		"Chi",
 	}
 	CssStrategyOpts = []string{
-		"Tailwind",
+		"Tailwind (v4)",
+		"Tailwind (v3)",
 		"Vanilla",
 	}
 	UILibraryOpts = map[string][]string{

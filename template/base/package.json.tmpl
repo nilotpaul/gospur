@@ -4,10 +4,14 @@
     "htmx.org": "^1.9.12"{{ end }},
     "livereload": "^0.9.3"{{ if .UI.HasPreline }},
     "preline": "^2.7.0"{{ end }}{{ if .UI.HasDaisy }},
-    "daisyui": "^4.12.23"{{ end }}{{ if .UI.HasTailwind }},
+    "daisyui": "^4.12.23"{{ end }}{{ if .UI.HasTailwind3 }},
     "esbuild-plugin-tailwindcss": "^1.2.3",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
-    "tailwindcss": "^3.4.16"{{ end }}
+    "tailwindcss": "^3.4.16"{{ end }}{{ if .UI.HasTailwind4 }},
+    "esbuild-plugin-tailwindcss": "^2.0.1",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "tailwindcss": "^4.1.8"{{ end }}
   }
 }

@@ -74,7 +74,7 @@ func processRootLayoutPageData(cfg StackConfig) string {
 	} else if cfg.WebFramework == "Chi" {
 		embedFn = "embed .Page ."
 	}
-	if cfg.CssStrategy == "Tailwind" {
+	if strings.HasPrefix(cfg.CssStrategy, "Tailwind") {
 		bodyClass = "flex items-center justify-center"
 	} else {
 		bodyClass = "container"
@@ -166,14 +166,14 @@ func processRawErrorPageData(cfg StackConfig) string {
 }
 
 func generateHomeHTMLBody(cfg StackConfig) string {
-	if cfg.CssStrategy == "Tailwind" {
+	if strings.HasPrefix(cfg.CssStrategy, "Tailwind") {
 		return tailwindHomeBodyExampleHTML
 	}
 	return basicHomeBodyExampleHTML
 }
 
 func generateErrorHTMLBody(cfg StackConfig) string {
-	if cfg.CssStrategy == "Tailwind" {
+	if strings.HasPrefix(cfg.CssStrategy, "Tailwind") {
 		return tailwindErrorBodyExampleHTML
 	}
 	return basicErrorBodyExampleHTML
