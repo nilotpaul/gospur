@@ -51,18 +51,16 @@ type Template struct {
 
 // Render should called when rendering html templates.
 func (t *Template) Render(w http.ResponseWriter, status int, name string, data any, layouts ...string) error {
-	var (
-		dataMap = map[string]any{"IsDev": t.isDev, "Page": name, "Ctx": data}
-		tmpls   = templates.(*Template)
-	)
+	dataMap := map[string]any{"IsDev": t.isDev, "Page": name, "Ctx": data}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(status)
 
+	layout := "Root.html"
 	if len(layouts) > 0 {
-		return tmpls.templates.ExecuteTemplate(w, layouts[0], dataMap)
+		layout = layouts[0]
 	}
-	return tmpls.templates.ExecuteTemplate(w, "Root.html", dataMap)
+	return t.templates.ExecuteTemplate(w, layout, dataMap)
 }
 
 // Start will run the API Server
