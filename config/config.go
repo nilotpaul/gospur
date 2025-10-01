@@ -31,17 +31,17 @@ var (
 		"Chi",
 	}
 	CssStrategyOpts = []string{
-		"Tailwind (v4)",
-		"Tailwind (v3)",
+		"Tailwind4",
+		"Tailwind3",
 		"Vanilla",
 	}
 	UILibraryOpts = map[string][]string{
-		"Preline": {"Tailwind"},
-		"DaisyUI": {"Tailwind"},
+		"Preline": {"Tailwind3", "Tailwind4"},
+		"DaisyUI": {"Tailwind3", "Tailwind4"},
 	}
 	RenderingStrategy = map[string]string{
-		"Templates":                        "Templates",
-		"Seperate Client (eg. react,etc.)": "Seperate",
+		"Templates":             "Templates",
+		"Seperate Client (SPA)": "Seperate",
 	}
 
 	// Flags Only

@@ -306,7 +306,7 @@ func skipProjectfiles(filePath string, cfg StackConfig) bool {
 		return true
 	}
 	// Skip tailwind config if tailwind is not selected as a CSS Strategy.
-	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind (v3)" {
+	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind3" {
 		return true
 	}
 	// Skip Dockerfile and dockerignore if not selected in extra options.
@@ -345,11 +345,9 @@ func matchStylingOpt(v string) bool {
 	switch v {
 	case "Vanilla":
 		return true
-	case "Tailwind":
+	case "Tailwind4":
 		return true
-	case "Tailwind (v4)":
-		return true
-	case "Tailwind (v3)":
+	case "Tailwind3":
 		return true
 	case "":
 		return true

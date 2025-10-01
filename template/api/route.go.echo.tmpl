@@ -7,10 +7,10 @@ import (
 )
 
 type Routes struct {
-	env config.EnvConfig
+	env *config.EnvConfig
 }
 
-func NewRouter(env config.EnvConfig) *Routes {
+func NewRouter(env *config.EnvConfig) *Routes {
 	return &Routes{
 		env: env,
 	}
@@ -29,10 +29,10 @@ import (
 )
 
 type Routes struct {
-	env config.EnvConfig
+	env *config.EnvConfig
 }
 
-func NewRouter(env config.EnvConfig) *Routes {
+func NewRouter(env *config.EnvConfig) *Routes {
 	return &Routes{
 		env: env,
 	}
