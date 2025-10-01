@@ -120,6 +120,11 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 			return fmt.Errorf("failed to create the public directory %v", err)
 		}
 	}
+	if cfg.RenderingStrategy == "Seperate" {
+		if err := createGitKeepFile(targetDir); err != nil {
+			return fmt.Errorf("failed to create .gitkeep inside web dir %v", err)
+		}
+	}
 
 	return nil
 }
@@ -240,6 +245,20 @@ func createExamplePublicAsset(projectDir string) error {
 	return nil
 }
 
+func createGitKeepFile(projectDir string) error {
+	fullFilePath := filepath.Join(projectDir, "web", ".gitkeep")
+	if err := CreateTargetDir(filepath.Dir(fullFilePath), false); err != nil {
+		return err
+	}
+
+	file, err := os.Create(fullFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return nil
+}
+
 // preprocessAPIFiles takes `StackConfig` and processes the Base Files to
 // strip, exclude any unnecessary files or configuration based on the `StackConfig`.
 func preprocessAPIFiles(cfg StackConfig) config.ProjectFiles {
@@ -306,7 +325,7 @@ func skipProjectfiles(filePath string, cfg StackConfig) bool {
 		return true
 	}
 	// Skip tailwind config if tailwind is not selected as a CSS Strategy.
-	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind" {
+	if filePath == "tailwind.config.js" && cfg.CssStrategy != "Tailwind3" {
 		return true
 	}
 	// Skip Dockerfile and dockerignore if not selected in extra options.
@@ -345,7 +364,9 @@ func matchStylingOpt(v string) bool {
 	switch v {
 	case "Vanilla":
 		return true
-	case "Tailwind":
+	case "Tailwind4":
+		return true
+	case "Tailwind3":
 		return true
 	case "":
 		return true

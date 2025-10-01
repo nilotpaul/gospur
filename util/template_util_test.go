@@ -14,10 +14,15 @@ func TestSkipProjectfiles(t *testing.T) {
 		WebFramework: "Echo",
 	}
 
-	// With tailwind, tailwind.config.js is needed.
-	mockStackCfg.CssStrategy = "Tailwind"
+	// With tailwind3, tailwind.config.js is needed.
+	mockStackCfg.CssStrategy = "Tailwind3"
 	skip := skipProjectfiles("tailwind.config.js", mockStackCfg)
 	a.False(skip)
+
+	// With tailwind4, tailwind.config.js is not needed.
+	mockStackCfg.CssStrategy = "Tailwind4"
+	skip = skipProjectfiles("tailwind.config.js", mockStackCfg)
+	a.True(skip)
 
 	// With Vanilla CSS, tailwind.config.js is not needed.
 	mockStackCfg.CssStrategy = "Vanilla"

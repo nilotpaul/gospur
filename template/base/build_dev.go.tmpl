@@ -6,47 +6,36 @@ package main
 
 import (
 	"html/template"
-	"os"
-	"path/filepath"
+	"log"
 
 	"github.com/labstack/echo/v4"
 )
 
-func ServeStatic(e *echo.Echo) *echo.Route {
-	return e.Static("/public", "public")
+func ServeStatic(e *echo.Echo) {
+	dir := "public"
+	e.Static("/public", dir)
 }
 
-// parseTemplates takes a directory where html files will reside.
-// It'll check nested dirs and load all files with .html ext.
-func parseTemplates() (*template.Template, error) {
-	var (
-		tmpl = template.New("")
-		dir  = "web"
-	)
+func parseTemplates(patterns ...string) (*template.Template, error) {
+	tmpl := template.New("")
 
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err == nil {
-			if !info.IsDir() && filepath.Ext(path) == ".html" {
-				_, err = tmpl.ParseFiles(path)
-				if err != nil {
-					return err
-				}
-			}
+	for _, pattern := range patterns {
+		parsedTmpl, err := tmpl.ParseGlob(pattern)
+		if err != nil {
+			return nil, err
 		}
-
-		return err
-	})
-
-	return tmpl, err
-}
-
-func LoadTemplates(e *echo.Echo) *template.Template {
-	tmpls, err := parseTemplates()
-	if err != nil {
-		e.Logger.Error(err)
+		tmpl = parsedTmpl
 	}
 
-	return tmpls
+	return tmpl, nil
+}
+
+func LoadTemplates(patterns ...string) *template.Template {
+	tmpl, err := parseTemplates(patterns...)
+	if err != nil {
+		log.Printf("template parsing error: %+v\n", err)
+	}
+	return tmpl
 }
 {{- else if and .Web.IsFiber .Render.IsTemplates -}}
 //go:build dev
@@ -60,7 +49,8 @@ import (
 )
 
 func ServeStatic(app *fiber.App) fiber.Router {
-	return app.Static("/public", "public")
+    dir := "public"
+	return app.Static("/public", dir)
 }
 
 func LoadTemplates() *html.Engine {
@@ -76,68 +66,47 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func ServeStatic(mux *chi.Mux) {
-	fs := http.FileServer(http.Dir("public"))
+	dir := "public"
+	fs := http.FileServer(http.Dir(dir))
 	mux.Get("/public/*", http.StripPrefix("/public", fs).ServeHTTP)
 }
 
-// parseTemplates takes a directory where html files will reside.
-// It'll check nested dirs and load all files with .html ext.
-func parseTemplates(funcs ...template.FuncMap) (*template.Template, error) {
-	var (
-		tmpl = template.New("")
-		dir  = "web"
-	)
-
-	// Registering functions
-	funcsMap := template.FuncMap{}
-	if len(funcs) > 0 {
-		for name, function := range funcs[0] {
-			funcsMap[name] = function
-		}
-	}
-
-	// embed func will help embedding templates from a template.
-	funcsMap["embed"] = func(name string, data any) template.HTML {
-		var out strings.Builder
-		if err := tmpl.ExecuteTemplate(&out, name, data); err != nil {
-			log.Println(err)
-		}
-
-		return template.HTML(out.String())
-	}
-
-	tmpl.Funcs(funcsMap)
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err == nil {
-			if !info.IsDir() && filepath.Ext(path) == ".html" {
-				_, err = tmpl.ParseFiles(path)
-				if err != nil {
-					return err
-				}
+func parseTemplates(patterns ...string) (*template.Template, error) {
+	tmpl := template.New("")
+	// adding the embed function for layouts
+	tmpl.Funcs(template.FuncMap{
+		"embed": func(name string, data any) template.HTML {
+			var out strings.Builder
+			if err := tmpl.ExecuteTemplate(&out, name, data); err != nil {
+				log.Println(err)
 			}
-		}
-
-		return err
+			return template.HTML(out.String())
+		},
 	})
 
-	return tmpl, err
-}
-
-func LoadTemplates(funcs ...template.FuncMap) *template.Template {
-	tmpls, err := parseTemplates(funcs...)
-	if err != nil {
-		log.Println(err)
+	for _, pattern := range patterns {
+		parsedTmpl, err := tmpl.ParseGlob(pattern)
+		if err != nil {
+			return nil, err
+		}
+		tmpl = parsedTmpl
 	}
 
-	return tmpls
+	return tmpl, nil
+}
+
+func LoadTemplates(patterns ...string) *template.Template {
+	tmpl, err := parseTemplates(patterns...)
+	if err != nil {
+		log.Printf("template parsing error: %+v\n", err)
+	}
+	return tmpl
 }
 {{- end -}}
 {{- if and .Web.IsEcho .Render.IsSeperate -}}

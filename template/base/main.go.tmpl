@@ -13,7 +13,7 @@ func main() {
 	env := config.MustloadEnv()
 
 	// API Server
-	server := api.NewAPIServer(*env, api.ServerConfig{
+	server := api.NewAPIServer(env, api.ServerConfig{
 		ServeStatic:   ServeStatic,
 		LoadTemplates: LoadTemplates,
 	})
@@ -35,7 +35,7 @@ func main() {
 	env := config.MustloadEnv()
 
 	// API Server
-	server := api.NewAPIServer(*env, api.ServerConfig{
+	server := api.NewAPIServer(env, api.ServerConfig{
 		ServeStatic:   ServeStatic,
 	})
 

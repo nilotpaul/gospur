@@ -7,8 +7,6 @@ package main
 import (
 	"embed"
 	"html/template"
-	"io/fs"
-	"path/filepath"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,37 +17,22 @@ var publicFS embed.FS
 //go:embed web/*
 var templateFS embed.FS
 
-func ServeStatic(e *echo.Echo) *echo.Route {
+func ServeStatic(e *echo.Echo) {
 	root := "public"
-	return e.StaticFS("/public", echo.MustSubFS(publicFS, root))
+	e.StaticFS("/public", echo.MustSubFS(publicFS, root))
 }
 
-// parseTemplates takes a embed.FS where html files will reside.
-// It'll check nested dirs and load all files with .html ext.
-func parseTemplates() (*template.Template, error) {
-	var (
-		tmpl = template.New("")
-		root = "."
-	)
+func parseTemplates(patterns ...string) (*template.Template, error) {
+	tmpl := template.New("")
 
-	err := fs.WalkDir(templateFS, root, func(path string, d fs.DirEntry, err error) error {
-		if err == nil {
-			if !d.IsDir() && filepath.Ext(path) == ".html" {
-				_, err := tmpl.ParseFS(templateFS, path)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		return err
-	})
+	parsedTmpl, err := tmpl.ParseFS(templateFS, patterns...)
+	tmpl = parsedTmpl
 
 	return tmpl, err
 }
 
-func LoadTemplates(*echo.Echo) *template.Template {
-	return template.Must(parseTemplates())
+func LoadTemplates(patterns ...string) *template.Template {
+	return template.Must(parseTemplates(patterns...))
 }
 {{- else if and .Web.IsFiber .Render.IsTemplates -}}
 //go:build !dev
@@ -98,10 +81,8 @@ package main
 import (
 	"embed"
 	"html/template"
-	"io/fs"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -118,51 +99,27 @@ func ServeStatic(mux *chi.Mux) {
 	mux.Get("/public/*", fs.ServeHTTP)
 }
 
-// parseTemplates takes a embed.FS where html files will reside.
-// It'll check nested dirs and load all files with .html ext.
-func parseTemplates(funcs ...template.FuncMap) (*template.Template, error) {
-	var (
-		tmpl = template.New("")
-		root = "."
-	)
-
-	// Registering functions
-	funcsMap := template.FuncMap{}
-	if len(funcs) > 0 {
-		for name, function := range funcs[0] {
-			funcsMap[name] = function
-		}
-	}
-
-	// embed func will help embedding templates from a template.
-	funcsMap["embed"] = func(name string, data any) template.HTML {
-		var out strings.Builder
-		if err := tmpl.ExecuteTemplate(&out, name, data); err != nil {
-			log.Println(err)
-		}
-
-		return template.HTML(out.String())
-	}
-
-	tmpl.Funcs(funcsMap)
-	err := fs.WalkDir(templateFS, root, func(path string, d fs.DirEntry, err error) error {
-		if err == nil {
-			if !d.IsDir() && filepath.Ext(path) == ".html" {
-				_, err := tmpl.ParseFS(templateFS, path)
-				if err != nil {
-					return err
-				}
+func parseTemplates(patterns ...string) (*template.Template, error) {
+	tmpl := template.New("")
+	// adding the embed function for layouts
+	tmpl.Funcs(template.FuncMap{
+		"embed": func(name string, data any) template.HTML {
+			var out strings.Builder
+			if err := tmpl.ExecuteTemplate(&out, name, data); err != nil {
+				log.Println(err)
 			}
-		}
-
-		return err
+			return template.HTML(out.String())
+		},
 	})
+
+	parsedTmpl, err := tmpl.ParseFS(templateFS, patterns...)
+	tmpl = parsedTmpl
 
 	return tmpl, err
 }
 
-func LoadTemplates(funcs ...template.FuncMap) *template.Template {
-	return template.Must(parseTemplates(funcs...))
+func LoadTemplates(patterns ...string) *template.Template {
+	return template.Must(parseTemplates(patterns...))
 }
 {{- end -}}
 {{- if and .Web.IsEcho .Render.IsSeperate -}}

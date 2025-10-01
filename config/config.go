@@ -31,16 +31,17 @@ var (
 		"Chi",
 	}
 	CssStrategyOpts = []string{
-		"Tailwind",
+		"Tailwind4",
+		"Tailwind3",
 		"Vanilla",
 	}
 	UILibraryOpts = map[string][]string{
-		"Preline": {"Tailwind"},
-		"DaisyUI": {"Tailwind"},
+		"Preline": {"Tailwind3", "Tailwind4"},
+		"DaisyUI": {"Tailwind3", "Tailwind4"},
 	}
 	RenderingStrategy = map[string]string{
-		"Templates":                        "Templates",
-		"Seperate Client (eg. react,etc.)": "Seperate",
+		"Templates":             "Templates",
+		"Seperate Client (SPA)": "Seperate",
 	}
 
 	// Flags Only
@@ -71,10 +72,10 @@ var (
 	// Template path is not required anymore for pages.
 	// We're processing these as raw files.
 	ProjectPageFiles = map[string]string{
-		"web/Home.html":           "",
-		"web/Error.html":          "",
-		"web/layouts/Root.html":   "",
-		"web/dist/instruction.md": "",
+		"web/Home.html":         "",
+		"web/Error.html":        "",
+		"web/layouts/Root.html": "",
+		"web/instruction.md":    "",
 	}
 
 	ProjectAPIFiles = map[string][]string{

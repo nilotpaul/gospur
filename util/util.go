@@ -72,7 +72,9 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 		},
 		"UI": map[string]bool{
 			// CSS Strategy
-			"HasTailwind": cfg.CssStrategy == "Tailwind",
+			"HasTailwind":  strings.HasPrefix(cfg.CssStrategy, "Tailwind"),
+			"HasTailwind4": cfg.CssStrategy == "Tailwind4",
+			"HasTailwind3": cfg.CssStrategy == "Tailwind3",
 
 			// CSS Library
 			"HasPreline": cfg.UILibrary == "Preline",

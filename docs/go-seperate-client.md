@@ -5,8 +5,7 @@ You have two options for integrating your frontend with the Go backend:
 1. Keep frontend inside this repo
 
 - Create your frontend project inside the `web` folder.
-- Do not modify `web/dist` directly - Go requires it to exist.
-- Configure your frontend to output static files to `web/dist`, replacing the default one.
+- Configure your frontend to output static files to `web/dist`.
 - If your build output directory is not `dist`, update it in `build_prod.go`.
 
 2. Keep frontend in a separate repo

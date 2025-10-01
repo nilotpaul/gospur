@@ -8,40 +8,34 @@ import (
 	"net/http"
 	"strings"
 
-	"{{ .ModPath }}/config"
+	"test/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-// templates is global var which implements the renderer interface.
-// It should be initialised before the start of the server.
-var templates Renderer
+var templates *Template
 
 type ServerConfig struct {
-	// Serving static assets from `public` folder.
+	// Serving static assets from public dir.
 	ServeStatic func(*chi.Mux)
 
-	// LoadTemplates will return the executed html templates.
-	LoadTemplates func(...template.FuncMap) *template.Template
+	// LoadTemplates takes glob petterns and returns the executed templates.
+	LoadTemplates func(...string) *template.Template
 }
 
 type APIServer struct {
 	listenAddr string
-	env        config.EnvConfig
+	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.PORT,
+		listenAddr:   ":" + env.Port,
 		env:          env,
 		ServerConfig: cfg,
 	}
-}
-
-type Renderer interface {
-	Render(w http.ResponseWriter, status int, name string, data any, layouts ...string) error
 }
 
 type Template struct {
@@ -49,27 +43,27 @@ type Template struct {
 	isDev     bool
 }
 
-// Render should called when rendering html templates.
 func (t *Template) Render(w http.ResponseWriter, status int, name string, data any, layouts ...string) error {
-	var (
-		dataMap = map[string]any{"IsDev": t.isDev, "Page": name, "Ctx": data}
-		tmpls   = templates.(*Template)
-	)
+	dataMap := map[string]any{"IsDev": t.isDev, "Page": name, "Ctx": data}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(status)
 
+	layout := "Root.html"
 	if len(layouts) > 0 {
-		return tmpls.templates.ExecuteTemplate(w, layouts[0], dataMap)
+		layout = layouts[0]
 	}
-	return tmpls.templates.ExecuteTemplate(w, "Root.html", dataMap)
+	return t.templates.ExecuteTemplate(w, layout, dataMap)
 }
 
 // Start will run the API Server
 // Any global middlewares like Logger should be registered here.
 func (api *APIServer) Start() error {
-	templates = &Template{templates: api.LoadTemplates(), isDev: !api.env.IsProduction()}
 	mux := chi.NewMux()
+	templates = &Template{
+		templates: api.LoadTemplates("web/*.html", "web/layouts/*.html"),
+		isDev:     !api.env.IsProduction(),
+	}
 
 	// Global Middlewares
 	api.registerGlobalMiddlewares(mux)
@@ -86,6 +80,12 @@ func (api *APIServer) Start() error {
 	return http.ListenAndServe(api.listenAddr, mux)
 }
 
+// Middlewares
+func (api *APIServer) registerGlobalMiddlewares(mux *chi.Mux) {
+	mux.Use(logger) // Logger should come before Recoverer
+	mux.Use(middleware.Recoverer)
+}
+
 func logger(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Skipping Logging of public assets.
@@ -97,12 +97,6 @@ func logger(h http.Handler) http.Handler {
 		fmt.Print("\n")
 		middleware.Logger(h).ServeHTTP(w, r)
 	})
-}
-
-// Extend the list of global middlewares as needed.
-func (api *APIServer) registerGlobalMiddlewares(mux *chi.Mux) {
-	mux.Use(logger) // Logger should come before Recoverer
-	mux.Use(middleware.Recoverer)
 }
 {{- else if .Render.IsSeperate -}}
 package api
@@ -118,19 +112,19 @@ import (
 )
 
 type ServerConfig struct {
-	// Serving static assets from `web` folder.
+	// Serving static assets from web folder.
 	ServeStatic func(*chi.Mux)
 }
 
 type APIServer struct {
 	listenAddr string
-	env        config.EnvConfig
+	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.PORT,
+		listenAddr:   ":" + env.Port,
 		env:          env,
 		ServerConfig: cfg,
 	}
@@ -156,7 +150,7 @@ func (api *APIServer) Start() error {
 	return http.ListenAndServe(api.listenAddr, mux)
 }
 
-// Extend the list of global middlewares as needed.
+// Middlewares
 func (api *APIServer) registerGlobalMiddlewares(mux *chi.Mux) {
 	mux.Use(middleware.Logger) // Logger should come before Recoverer
 	mux.Use(middleware.Recoverer)

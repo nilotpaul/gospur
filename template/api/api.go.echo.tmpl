@@ -14,24 +14,22 @@ import (
 )
 
 type ServerConfig struct {
-	// Serving static assets from `public` folder.
-	ServeStatic func(*echo.Echo) *echo.Route
+	// Serving static assets from public dir.
+	ServeStatic func(*echo.Echo)
 
-	// LoadTemplates will return the executed html templates.
-	// In development, it'll log the errors only.
-	// In production, it'll panic and crash.
-	LoadTemplates func(*echo.Echo) *template.Template
+	// LoadTemplates takes glob petterns and returns the executed templates.
+	LoadTemplates func(...string) *template.Template
 }
 
 type APIServer struct {
 	listenAddr string
-	env        config.EnvConfig
+	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.PORT,
+		listenAddr:   ":" + env.Port,
 		env:          env,
 		ServerConfig: cfg,
 	}
@@ -59,18 +57,18 @@ func (api *APIServer) Start() error {
 
 type Template struct {
 	templates *template.Template
-	env       config.EnvConfig
+	isDev     bool
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.templates.ExecuteTemplate(w, name, map[string]any{
-		"IsDev": !t.env.IsProduction(),
+		"IsDev": t.isDev,
 		"Ctx":   data,
 	},
 	)
 }
 
-// Extend the list of global middlewares as needed.
+// Middlewares
 func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
 	e.Use(middleware.Recover())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -82,7 +80,10 @@ func (api *APIServer) registerGlobalMiddlewares(e *echo.Echo) {
 	}))
 
 	e.HTTPErrorHandler = HTTPErrorHandler
-	e.Renderer = &Template{templates: api.LoadTemplates(e), env: api.env}
+	e.Renderer = &Template{
+		templates: api.LoadTemplates("web/*.html"), // add more here
+		isDev:     !api.env.IsProduction(),
+	}
 }
 {{- else if .Render.IsSeperate -}}
 package api
@@ -97,19 +98,19 @@ import (
 )
 
 type ServerConfig struct {
-	// Serving static assets from `web` folder.
+	// Serving static assets from public dir.
 	ServeStatic func(*echo.Echo)
 }
 
 type APIServer struct {
 	listenAddr string
-	env        config.EnvConfig
+	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.PORT,
+		listenAddr:   ":" + env.Port,
 		env:          env,
 		ServerConfig: cfg,
 	}

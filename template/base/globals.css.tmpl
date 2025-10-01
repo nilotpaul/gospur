@@ -1,7 +1,11 @@
-{{- if .UI.HasTailwind -}}
+{{- if .UI.HasTailwind3 -}}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+{{- else if .UI.HasTailwind4 -}}
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
 {{- else -}}
 h1 {
   color: red;

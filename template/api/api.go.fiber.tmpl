@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"{{ .ModPath }}/config"
+	"test/config"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -15,7 +15,7 @@ import (
 )
 
 type ServerConfig struct {
-	// Serving static assets from `public` folder.
+	// Serving static assets from public folder.
 	ServeStatic func(*fiber.App) fiber.Router
 
 	// LoadTemplates will return the executed html templates.
@@ -24,13 +24,13 @@ type ServerConfig struct {
 
 type APIServer struct {
 	listenAddr string
-	env        config.EnvConfig
+	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.PORT,
+		listenAddr:   ":" + env.Port,
 		env:          env,
 		ServerConfig: cfg,
 	}
@@ -45,7 +45,7 @@ func (t *TemplatesEngine) Load() error {
 	return t.engine.Load()
 }
 
-// Overriding `Render` func
+// Overriding Render func
 func (t *TemplatesEngine) Render(w io.Writer, name string, data interface{}, layouts ...string) error {
 	return t.engine.Render(w, name, map[string]any{"IsDev": t.isDev, "Ctx": data}, layouts...)
 }
@@ -53,12 +53,13 @@ func (t *TemplatesEngine) Render(w io.Writer, name string, data interface{}, lay
 // Start will run the API Server
 // Any global middlewares like Logger should be registered here.
 func (api *APIServer) Start() error {
-	engine := api.LoadTemplates()
-
 	app := fiber.New(fiber.Config{
 		ErrorHandler: HTTPErrorHandler,
-		Views:        &TemplatesEngine{engine: engine, isDev: !api.env.IsProduction()},
-		ViewsLayout:  "layouts/Root",
+		Views: &TemplatesEngine{
+			engine: api.LoadTemplates(),
+			isDev:  !api.env.IsProduction(),
+		},
+		ViewsLayout: "layouts/Root",
 	})
 
 	// Global Middlewares
@@ -76,7 +77,7 @@ func (api *APIServer) Start() error {
 	return app.Listen(api.listenAddr)
 }
 
-// Extend the list of global middlewares as needed.
+// Middlewares
 func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
@@ -100,19 +101,19 @@ import (
 )
 
 type ServerConfig struct {
-	// Serving static assets from `web` folder.
+	// Serving static assets from web folder.
 	ServeStatic func(*fiber.App)
 }
 
 type APIServer struct {
 	listenAddr string
-	env        config.EnvConfig
+	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.PORT,
+		listenAddr:   ":" + env.Port,
 		env:          env,
 		ServerConfig: cfg,
 	}
@@ -140,7 +141,7 @@ func (api *APIServer) Start() error {
 	return app.Listen(api.listenAddr)
 }
 
-// Extend the list of global middlewares as needed.
+// Middlewares
 func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
 	app.Use(recover.New())
 	app.Use(logger.New())
