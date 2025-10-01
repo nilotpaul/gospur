@@ -72,10 +72,10 @@ var (
 	// Template path is not required anymore for pages.
 	// We're processing these as raw files.
 	ProjectPageFiles = map[string]string{
-		"web/Home.html":           "",
-		"web/Error.html":          "",
-		"web/layouts/Root.html":   "",
-		"web/dist/instruction.md": "",
+		"web/Home.html":         "",
+		"web/Error.html":        "",
+		"web/layouts/Root.html": "",
+		"web/instruction.md":    "",
 	}
 
 	ProjectAPIFiles = map[string][]string{

@@ -208,11 +208,10 @@ func generateInstruction() string {
 	return `
 # Instructions
 After building your frontend, copy the static files in this directory.
-Make sure you do not copy the entire folder (build, dist, etc.), only bring the files from it.
 
 -> web/dist/...files
 
-For more info visit -> 
+For more info visit -> https://github.com/nilotpaul/gospur/blob/main/docs/go-seperate-client.md
 **You can delete this file later.**
 `
 }

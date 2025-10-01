@@ -120,6 +120,11 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 			return fmt.Errorf("failed to create the public directory %v", err)
 		}
 	}
+	if cfg.RenderingStrategy == "Seperate" {
+		if err := createGitKeepFile(targetDir); err != nil {
+			return fmt.Errorf("failed to create .gitkeep inside web dir %v", err)
+		}
+	}
 
 	return nil
 }
@@ -237,6 +242,20 @@ func createExamplePublicAsset(projectDir string) error {
 		return err
 	}
 
+	return nil
+}
+
+func createGitKeepFile(projectDir string) error {
+	fullFilePath := filepath.Join(projectDir, "web", ".gitkeep")
+	if err := CreateTargetDir(filepath.Dir(fullFilePath), false); err != nil {
+		return err
+	}
+
+	file, err := os.Create(fullFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 	return nil
 }
 
