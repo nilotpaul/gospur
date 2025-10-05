@@ -14,9 +14,9 @@ You have two options for integrating your frontend with the Go backend:
 - Merge the generated `dist` folder into `web/dist`.
 
 ## Examples
-- [Basic Github Actions](#)
-- [Docker Github Actions](#)
-- [Dockerfile](#)
+- [Basic Github Actions](/docs/ci-examples.md#basic-github-action)
+- [Docker Github Actions](/docs/ci-examples.md#docker--github-actions)
+- [Dockerfile](/docs/ci-examples.md#dockerfile-example)
 
 > **TODO: will update later.**
 

@@ -24,8 +24,9 @@ These will be asked as prompts when you run `init`. If an option is selected by 
 ```
 
 **Styling**
-- Vanilla  
-- Tailwind
+- Tailwind 4
+- Tailwind 3
+- Vanilla
 ```sh
 # flag
 --styling Tailwind

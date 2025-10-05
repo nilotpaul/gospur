@@ -22,7 +22,7 @@ dev:
 	go build -tags 'dev' -o bin/build . \
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
     :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
-	:: wgo -dir=node_modules npx livereload -w 400 public
+	:: wgo -dir=node_modules npx livereload -w 800 -ee go .
 ```
 
 These are the default development commands which will be pre-configured for you.
@@ -35,10 +35,10 @@ Please use git bash instead of command prompt or powershell and use the same `Ma
 
 ### If Auto Browser Reload Feels Slow
 
-Change the delay time (ms) of the command, default will be 400ms.
+Change the delay time (ms) of the command, default will be 800ms.
 
 ```sh
-go -dir=node_modules npx livereload -w 800 -ee go .
+wgo -dir=node_modules npx livereload -w 800 -ee go .
 ```
 
 ## Environment Variables
