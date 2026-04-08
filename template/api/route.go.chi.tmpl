@@ -7,14 +7,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Routes struct {
-	env *config.EnvConfig
-}
+type Routes struct {}
 
-func NewRouter(env *config.EnvConfig) *Routes {
-	return &Routes{
-		env: env,
-	}
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
 func (r *Routes) RegisterRoutes(router chi.Router) {
@@ -29,14 +25,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Routes struct {
-	env *config.EnvConfig
-}
+type Routes struct {}
 
-func NewRouter(env *config.EnvConfig) *Routes {
-	return &Routes{
-		env: env,
-	}
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
 func (r *Routes) RegisterRoutes(router chi.Router) {

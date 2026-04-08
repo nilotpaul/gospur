@@ -1,0 +1,73 @@
+{{- if .UI.HasTailwind -}}
+package layouts
+
+import "context"
+
+func getCtx(ctx context.Context) map[string]any {
+	if data, ok := ctx.Value("ctx").(map[string]any); ok {
+		return data
+	}
+	return map[string]any{}
+}
+
+templ Root(title, desc string) {
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			// styles
+			<link rel="stylesheet" href="public/bundle/globals.css"/>
+			// For live reloading
+			if getCtx(ctx)["IsDev"].(bool) {
+				<script src="http://localhost:35729/livereload.js"></script>
+			}
+			// Bundled Javascript
+			<script defer src="public/bundle/preline.js"></script>
+			<title>
+				{ title }
+			</title>
+			<meta name="title" content={ title }/>
+			<meta name="description" content={ desc }/>
+		</head>
+		<body class="flex flex-col items-center">
+			{ children... }
+		</body>
+	</html>
+}
+{{- else -}}
+package layouts
+
+import "context"
+
+func getCtx(ctx context.Context) map[string]any {
+	if data, ok := ctx.Value("ctx").(map[string]any); ok {
+		return data
+	}
+	return map[string]any{}
+}
+
+templ Root(title, desc string) {
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			// styles
+			<link rel="stylesheet" href="public/bundle/globals.css"/>
+			// For live reloading
+			if getCtx(ctx)["IsDev"].(bool) {
+				<script src="http://localhost:35729/livereload.js"></script>
+			}
+			// Bundled Javascript
+			<script defer src="public/bundle/preline.js"></script>
+			<title>
+				{ title }
+			</title>
+			<meta name="title" content={ title }/>
+			<meta name="description" content={ desc }/>
+		</head>
+		<body class="container">
+			{ children... }
+		</body>
+	</html>
+}
+{{- end -}}

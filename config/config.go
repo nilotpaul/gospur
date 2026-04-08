@@ -41,6 +41,7 @@ var (
 	}
 	RenderingStrategy = map[string]string{
 		"Templates":             "Templates",
+		"</> Templ":             "Templ",
 		"Seperate Client (SPA)": "Seperate",
 	}
 
@@ -72,10 +73,17 @@ var (
 	// Template path is not required anymore for pages.
 	// We're processing these as raw files.
 	ProjectPageFiles = map[string]string{
+		// for templates
 		"web/Home.html":         "",
 		"web/Error.html":        "",
 		"web/layouts/Root.html": "",
-		"web/instruction.md":    "",
+
+		// for templ
+		"web/Home.templ":         "page/Home.templ.tmpl",
+		"web/Error.templ":        "page/Error.templ.tmpl",
+		"web/layouts/Root.templ": "page/Root.templ.tmpl",
+
+		"web/instruction.md": "",
 	}
 
 	ProjectAPIFiles = map[string][]string{

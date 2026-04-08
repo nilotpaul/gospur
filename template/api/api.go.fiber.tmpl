@@ -24,14 +24,12 @@ type ServerConfig struct {
 
 type APIServer struct {
 	listenAddr string
-	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer() *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.Port,
-		env:          env,
+		listenAddr:   ":" + config.Env.Port,
 		ServerConfig: cfg,
 	}
 }
@@ -57,7 +55,7 @@ func (api *APIServer) Start() error {
 		ErrorHandler: HTTPErrorHandler,
 		Views: &TemplatesEngine{
 			engine: api.LoadTemplates(),
-			isDev:  !api.env.IsProduction(),
+			isDev:  !config.Env.IsProduction(),
 		},
 		ViewsLayout: "layouts/Root",
 	})
@@ -66,7 +64,7 @@ func (api *APIServer) Start() error {
 	api.registerGlobalMiddlewares(app)
 
 	// Routes
-	r := NewRouter(api.env)
+	r := NewRouter()
 	r.RegisterRoutes(app)
 
 	// Static routes
@@ -86,6 +84,80 @@ func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
 			return strings.HasPrefix(c.Path(), "/public")
 		},
 	}))
+}
+{{- else if .Render.IsTempl -}}
+package api
+
+import (
+	"context"
+	"log"
+	"strings"
+
+	"{{ .ModPath }}/config"
+
+	"github.com/a-h/templ"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+)
+
+type ServerConfig struct {
+	// Serving static assets from public folder.
+	ServeStatic func(*fiber.App) fiber.Router
+}
+
+type APIServer struct {
+	listenAddr string
+	ServerConfig
+}
+
+func NewAPIServer(cfg ServerConfig) *APIServer {
+	return &APIServer{
+		listenAddr:   ":" + config.Env.Port,
+		ServerConfig: cfg,
+	}
+}
+
+// Start will run the API Server
+// Any global middlewares like Logger should be registered here.
+func (api *APIServer) Start() error {
+	app := fiber.New(fiber.Config{
+		ErrorHandler: HTTPErrorHandler,
+		ViewsLayout:  "layouts/Root",
+	})
+
+	// Global Middlewares
+	api.registerGlobalMiddlewares(app)
+
+	// Routes
+	r := NewRouter()
+	r.RegisterRoutes(app)
+
+	// Static routes
+	api.ServeStatic(app)
+
+	log.Printf("Visit http://localhost%s", api.listenAddr)
+
+	return app.Listen(api.listenAddr)
+}
+
+// Middlewares
+func (api *APIServer) registerGlobalMiddlewares(app *fiber.App) {
+	app.Use(recover.New())
+	app.Use(logger.New(logger.Config{
+		Next: func(c *fiber.Ctx) bool {
+			// Skipping Logging of public assets.
+			return strings.HasPrefix(c.Path(), "/public")
+		},
+	}))
+}
+
+func Render(comp templ.Component, c *fiber.Ctx) error {
+	c.Response().Header.Add("Content-Type", "text/html;charset=utf8")
+	ctx := context.WithValue(c.Context(), "ctx", map[string]any{
+		"IsDev": !config.Env.IsProduction(),
+	})
+	return comp.Render(ctx, c.Response().BodyWriter())
 }
 {{- else if .Render.IsSeperate -}}
 package api
@@ -107,14 +179,12 @@ type ServerConfig struct {
 
 type APIServer struct {
 	listenAddr string
-	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.Port,
-		env:          env,
+		listenAddr:   ":" + config.Env.Port,
 		ServerConfig: cfg,
 	}
 }
@@ -130,7 +200,7 @@ func (api *APIServer) Start() error {
 	api.registerGlobalMiddlewares(app)
 
 	// Routes
-	r := NewRouter(api.env)
+	r := NewRouter()
 	r.RegisterRoutes(app)
 
 	// Static routes

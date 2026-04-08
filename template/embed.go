@@ -10,6 +10,9 @@ var base embed.FS
 //go:embed api/*
 var api embed.FS
 
+//go:embed page/*
+var pages embed.FS
+
 //go:embed public/golang.jpg
 var img []byte
 
@@ -19,6 +22,10 @@ func GetBaseFiles() embed.FS {
 
 func GetAPIFiles() embed.FS {
 	return api
+}
+
+func GetPageFiles() embed.FS {
+	return pages
 }
 
 func GetGolangImage() []byte {

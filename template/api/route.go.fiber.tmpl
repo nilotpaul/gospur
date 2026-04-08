@@ -7,14 +7,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type Routes struct {
-	env *config.EnvConfig
+type Routes struct {}
+
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
-func NewRouter(env *config.EnvConfig) *Routes {
-	return &Routes{
-		env: env,
-	}
+func (r *Routes) RegisterRoutes(router fiber.Router) {
+	router.Add("GET", "/", handleGetHome)
+}
+{{- else if .Render.IsTempl -}}
+package api
+
+import (
+	"github.com/gofiber/fiber/v2"
+)
+
+type Routes struct{}
+
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
 func (r *Routes) RegisterRoutes(router fiber.Router) {
@@ -29,14 +41,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type Routes struct {
-	env *config.EnvConfig
-}
+type Routes struct {}
 
-func NewRouter(env *config.EnvConfig) *Routes {
-	return &Routes{
-		env: env,
-	}
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
 func (r *Routes) RegisterRoutes(router fiber.Router) {

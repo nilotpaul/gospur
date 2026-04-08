@@ -6,14 +6,10 @@ import (
 	"{{ .ModPath }}/config"
 )
 
-type Routes struct {
-	env *config.EnvConfig
-}
+type Routes struct {}
 
-func NewRouter(env *config.EnvConfig) *Routes {
-	return &Routes{
-		env: env,
-	}
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
 func (r *Routes) RegisterRoutes(router *echo.Router) {
@@ -28,14 +24,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Routes struct {
-	env *config.EnvConfig
-}
+type Routes struct {}
 
-func NewRouter(env *config.EnvConfig) *Routes {
-	return &Routes{
-		env: env,
-	}
+func NewRouter() *Routes {
+	return &Routes{}
 }
 
 func (r *Routes) RegisterRoutes(router *echo.Router) {

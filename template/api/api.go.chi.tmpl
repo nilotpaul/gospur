@@ -26,14 +26,12 @@ type ServerConfig struct {
 
 type APIServer struct {
 	listenAddr string
-	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.Port,
-		env:          env,
+		listenAddr:   ":" + config.Env.Port,
 		ServerConfig: cfg,
 	}
 }
@@ -62,14 +60,14 @@ func (api *APIServer) Start() error {
 	mux := chi.NewMux()
 	templates = &Template{
 		templates: api.LoadTemplates("web/*.html", "web/layouts/*.html"),
-		isDev:     !api.env.IsProduction(),
+		isDev:     !config.Env.IsProduction(),
 	}
 
 	// Global Middlewares
 	api.registerGlobalMiddlewares(mux)
 
 	// Routes
-	r := NewRouter(api.env)
+	r := NewRouter()
 	r.RegisterRoutes(mux)
 
 	// Static routes
@@ -118,14 +116,12 @@ type ServerConfig struct {
 
 type APIServer struct {
 	listenAddr string
-	env        *config.EnvConfig
 	ServerConfig
 }
 
-func NewAPIServer(env *config.EnvConfig, cfg ServerConfig) *APIServer {
+func NewAPIServer(cfg ServerConfig) *APIServer {
 	return &APIServer{
-		listenAddr:   ":" + env.Port,
-		env:          env,
+		listenAddr:   ":" + config.Env.Port,
 		ServerConfig: cfg,
 	}
 }
@@ -139,7 +135,7 @@ func (api *APIServer) Start() error {
 	api.registerGlobalMiddlewares(mux)
 
 	// Routes
-	r := NewRouter(api.env)
+	r := NewRouter()
 	r.RegisterRoutes(mux)
 	
 	// Static routes

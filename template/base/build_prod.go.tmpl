@@ -190,6 +190,30 @@ func ServeStatic(app *fiber.App) {
 		NotFoundFile: fallback,
 	}))
 }
+{{- else if and .Web.IsFiber .Render.IsTempl -}}
+//go:build !dev
+// +build !dev
+
+package main
+
+import (
+	"embed"
+	"net/http"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+)
+
+//go:embed public/*
+var publicFS embed.FS
+
+func ServeStatic(app *fiber.App) fiber.Router {
+	root := "public"
+	return app.Use("/public", filesystem.New(filesystem.Config{
+		PathPrefix: root,
+		Root:       http.FS(publicFS),
+	}))
+}
 {{- else if and .Web.IsChi .Render.IsSeperate -}}
 //go:build !dev
 // +build !dev

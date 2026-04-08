@@ -11,16 +11,17 @@ import (
 func main() {
 	// Loading the env vars from either a `.env` file or runtime.
 	env := config.MustloadEnv()
+	config.Env = env
 
 	// API Server
-	server := api.NewAPIServer(env, api.ServerConfig{
+	server := api.NewAPIServer(api.ServerConfig{
 		ServeStatic:   ServeStatic,
 		LoadTemplates: LoadTemplates,
 	})
 
 	log.Fatal(server.Start())
 }
-{{- else if .Render.IsSeperate -}}
+{{- else if (or .Render.IsSeperate .Render.IsTempl) -}}
 package main
 
 import (
@@ -33,9 +34,10 @@ import (
 func main() {
 	// Loading the env vars from either a `.env` file or runtime.
 	env := config.MustloadEnv()
+	config.Env = env
 
 	// API Server
-	server := api.NewAPIServer(env, api.ServerConfig{
+	server := api.NewAPIServer(api.ServerConfig{
 		ServeStatic:   ServeStatic,
 	})
 

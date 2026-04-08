@@ -91,7 +91,7 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 	//
 	// These needs to be processed seperately as it needs to be written
 	// as template files itself, thus parsing isn't required.
-	for targetPath := range preprocessPageFiles(cfg) {
+	for targetPath, templatePath := range preprocessPageFiles(cfg) {
 		var (
 			paths = strings.Split(targetPath, "/")
 			name  = paths[len(paths)-1]
@@ -101,16 +101,40 @@ func CreateProject(targetDir string, cfg StackConfig, data interface{}) error {
 		// It's joined with the project/target dir.
 		targetFilePath := filepath.Join(targetDir, targetPath)
 
-		// Generating the page content with `StackConfig`.
-		fileBytes := generatePageContent(name, cfg)
+		// raw data (for html files)
+		if cfg.RenderingStrategy != "Templ" {
+			// Generating the page content with `StackConfig`.
+			fileBytes := generateHTMLPageContent(name, cfg)
 
-		// Creating the file with the raw template.
-		if err := writeRawTemplateFile(targetFilePath, fileBytes); err != nil {
-			return fmt.Errorf(
-				"failed to create file -> '%s' due to %v",
-				targetFilePath,
-				err,
+			// Creating the file with the raw template.
+			if err := writeRawTemplateFile(targetFilePath, fileBytes); err != nil {
+				return fmt.Errorf(
+					"failed to create file -> '%s' due to %v",
+					targetFilePath,
+					err,
+				)
+			}
+		} else {
+			// tmpl files (for .templ)
+			tmplFS := tmpls.GetPageFiles()
+			processedTmpl, err := parseTemplate(targetFilePath, templatePath, tmplFS)
+			if err != nil {
+				return fmt.Errorf("template Parsing Error (pls report): %v", err)
+			}
+
+			// Creating the file with the parsed template.
+			err = createFileFromTemplate(
+				processedTmpl.targetFilePath,
+				processedTmpl.template,
+				data,
 			)
+			if err != nil {
+				return fmt.Errorf(
+					"failed to create file -> '%s' due to %v",
+					processedTmpl.targetFilePath,
+					err,
+				)
+			}
 		}
 	}
 
@@ -305,6 +329,14 @@ func preprocessPageFiles(cfg StackConfig) config.ProjectFiles {
 		if cfg.RenderingStrategy != "Seperate" && strings.HasSuffix(target, "instruction.md") {
 			continue
 		}
+		// Skip .templ files if Templates is chosen
+		if cfg.RenderingStrategy == "Templates" && strings.HasSuffix(target, ".templ") {
+			continue
+		}
+		// Skip html template files with Templ is choosen
+		if cfg.RenderingStrategy == "Templ" && strings.HasSuffix(target, ".html") {
+			continue
+		}
 		// Skip layouts dir if not supported.
 		if strings.HasPrefix(target, "web/layouts") && (cfg.WebFramework != "Fiber" && cfg.WebFramework != "Chi") {
 			continue
@@ -352,6 +384,8 @@ func matchFrameworkOpt(v string) bool {
 func matchRenderOpt(v string) bool {
 	switch v {
 	case "Templates":
+		return true
+	case "Templ":
 		return true
 	case "Seperate":
 		return true

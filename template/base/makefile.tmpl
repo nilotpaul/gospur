@@ -22,6 +22,32 @@ dev:
     :: ENVIRONMENT=DEVELOPMENT ./bin/build \
     :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
 	:: wgo -dir=node_modules npx livereload -w 800 -ee go .
+{{- else if .Render.IsTempl -}}
+start: 
+	@node ./esbuild.config.js
+	@templ generate
+	@go build -tags '!dev' -o bin/build
+	@ENVIRONMENT=PRODUCTION ./bin/build
+
+build:
+	@node ./esbuild.config.js
+	@templ generate
+	@go build -tags 'dev' -o bin/build
+	
+dev:
+	@wgo \
+    -exit \
+    -file=.go \
+	-file=.templ \
+    -file=.html \
+	-file=.css \
+	-xfile=_templ.go \
+	-xdir=public \
+	templ generate \
+	:: go build -tags 'dev' -o bin/build . \
+    :: ENVIRONMENT=DEVELOPMENT ./bin/build \
+    :: wgo -xdir=bin -xdir=node_modules -xdir=public node ./esbuild.config.js \
+	:: wgo -dir=node_modules npx livereload -w 800 -ee go .
 {{- else -}}
 start: 
 	@go build -tags '!dev' -o bin/build

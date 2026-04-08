@@ -14,7 +14,6 @@ const (
       <h1>{{ .Ctx.Title }}</h1>
       <img
         src="public/golang.jpg"
-        class="rounded-md"
         height="500"
         width="500"
       />
@@ -47,7 +46,7 @@ const (
 </body>`
 )
 
-func generatePageContent(page string, cfg StackConfig) []byte {
+func generateHTMLPageContent(page string, cfg StackConfig) []byte {
 	var result string
 
 	switch page {

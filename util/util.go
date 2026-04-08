@@ -82,6 +82,7 @@ func MakeProjectCtx(cfg StackConfig, modPath string) map[string]any {
 		},
 		"Render": map[string]bool{
 			"IsTemplates": cfg.RenderingStrategy == "Templates",
+			"IsTempl":     cfg.RenderingStrategy == "Templ",
 			"IsSeperate":  cfg.RenderingStrategy == "Seperate",
 		},
 		"Extras": map[string]bool{

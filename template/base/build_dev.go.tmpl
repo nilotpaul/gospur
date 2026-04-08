@@ -142,4 +142,18 @@ import (
 )
 
 func ServeStatic(*chi.Mux) {}
+{{ else if and .Web.IsFiber .Render.IsTempl }}
+//go:build dev
+// +build dev
+
+package main
+
+import (
+	"github.com/gofiber/fiber/v2"
+)
+
+func ServeStatic(app *fiber.App) fiber.Router {
+	dir := "public"
+	return app.Static("/public", dir)
+}
 {{- end -}}

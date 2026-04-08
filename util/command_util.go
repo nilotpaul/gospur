@@ -87,7 +87,9 @@ func GetStackConfig(cfg *StackConfig) error {
 		}
 	}
 	// CSS Strategy
-	if len(cfg.CssStrategy) == 0 && cfg.RenderingStrategy == "Templates" {
+	if len(cfg.CssStrategy) == 0 &&
+		(cfg.RenderingStrategy == "Templates" ||
+			cfg.RenderingStrategy == "Templ") {
 		extraPrompt := promptui.Select{
 			Label: "Choose a CSS Strategy",
 			Items: config.CssStrategyOpts,
@@ -99,7 +101,9 @@ func GetStackConfig(cfg *StackConfig) error {
 		cfg.CssStrategy = css
 	}
 	// UI Library Options
-	if len(cfg.UILibrary) == 0 && cfg.RenderingStrategy == "Templates" {
+	if len(cfg.UILibrary) == 0 &&
+		(cfg.RenderingStrategy == "Templates" ||
+			cfg.RenderingStrategy == "Templ") {
 		// Filtering the opts for UI Libs based on the css strategy chosen.
 		filteredOpts := make([]string, 0)
 		for lib, deps := range config.UILibraryOpts {
@@ -291,6 +295,14 @@ npm install
 cd %s
 go install github.com/bokwoon95/wgo@latest
 go mod tidy
+`, path)))
+	} else if cfg.RenderingStrategy == "Templ" {
+		fmt.Println(config.FaintMsg(fmt.Sprintf(`
+cd %s
+go install github.com/a-h/templ/cmd/templ@latest
+go install github.com/bokwoon95/wgo@latest
+go mod tidy
+npm install
 `, path)))
 	} else {
 		fmt.Println(config.FaintMsg(fmt.Sprintf(`
